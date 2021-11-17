@@ -3,5 +3,8 @@ project(Jezyk_z_czasem)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Jezyk_z_czasem
-        main.cpp)
+add_executable(tln
+        sources/main.cpp
+        sources/CodeSource.cpp
+        headers/CodeSource.h
+        headers/CharAndPosition.h)
