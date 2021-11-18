@@ -9,14 +9,14 @@ typedef unsigned int uint;
 
 struct CharAndPosition {
     char readChar;
-    bool endOfText;
+    bool isEndOfText;
     uint column;
     uint line;
 
-    CharAndPosition(char c, uint lin, uint col) : readChar(c), endOfText(false),
+    CharAndPosition(char c, uint lin, uint col) : readChar(c), isEndOfText(false),
                                                   column(col), line(lin) {}
 
-    CharAndPosition(uint lin, uint col) : endOfText(true), column(col), line(lin) {}
+    CharAndPosition(uint lin, uint col) : isEndOfText(true), column(col), line(lin) {}
 };
 
 #endif //JEZYK_Z_CZASEM_CHARANDPOSITION_H

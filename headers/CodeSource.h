@@ -21,6 +21,10 @@ public:
     CharAndPosition getNextChar() { return (this->*getCharFunc)(); }
 
 private:
+    uint line = 0;
+    
+    uint column = 0;
+
     std::fstream source_file;
 
     std::vector<std::string> commands;
