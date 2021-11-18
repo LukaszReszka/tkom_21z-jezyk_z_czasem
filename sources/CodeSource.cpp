@@ -3,10 +3,18 @@
  * */
 
 #include "../headers/CodeSource.h"
+#include <iostream>
 
 
 CodeSource::CodeSource() {
-    //body required!!!
+    std::cout << "\033[33mType code below. To finish program, input \"" + FINISH_TYPING_SYMBOL +
+                 "\" in new line.\033[0m" << std::endl;
+    std::string code_line;
+    do {
+        std::getline(std::cin, code_line);
+        commands.push_back(code_line);
+    } while (code_line != FINISH_TYPING_SYMBOL);
+
     getCharFunc = &CodeSource::getCharFromTerminal;
 }
 
@@ -17,28 +25,52 @@ CodeSource::CodeSource(std::string &file_name) {
     getCharFunc = &CodeSource::getCharFromFile;
 }
 
+CodeSource::CodeSource(std::vector <std::string>
+                       &code_lines) {
+    commands = code_lines;
+    getCharFunc = &CodeSource::getCharFromTerminal;
+}
+
 CodeSource::~CodeSource() {
     if (source_file.is_open())
         source_file.close();
+    commands.clear();
 }
 
 CharAndPosition CodeSource::getCharFromFile() {
     char c;
     source_file.get(c);
+
     if (source_file.eof()) {
         CharAndPosition eofChar(line, column);
         source_file.close();
         return eofChar;
     }
-    if (c == '\n') {
-        ++column;
-        line = 0;
-    }
+
     CharAndPosition readChar(c, line, column);
-    ++line;
+    ++column;
+    if (c == '\n') {
+        ++line;
+        column = 0;
+    }
+
     return readChar;
 }
 
 CharAndPosition CodeSource::getCharFromTerminal() {
+    if (column == 0 && commands[line] == FINISH_TYPING_SYMBOL) {
+        CharAndPosition eofChar(line, column);
+        commands.clear();
+        return eofChar;
+    }
 
+    char c = commands[line][column];
+    CharAndPosition readChar(c, line, column);
+    ++column;
+    if (column >= commands[line].size()) {
+        ++line;
+        column = 0;
+    }
+
+    return readChar;
 }
