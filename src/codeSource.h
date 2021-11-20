@@ -1,7 +1,3 @@
-/* TKOM21Z - Język z czasem
- * Autor: Łukasz Reszka (300257)
- * */
-
 #ifndef JEZYK_Z_CZASEM_CODESOURCE_H
 #define JEZYK_Z_CZASEM_CODESOURCE_H
 
@@ -14,7 +10,7 @@ const std::string FINISH_TYPING_SYMBOL = "^q";
 class CodeSource {
 
 public:
-    CodeSource(std::istream &input);
+    explicit CodeSource(std::istream &input);
 
     explicit CodeSource(std::string &file_name);
 

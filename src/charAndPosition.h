@@ -1,7 +1,3 @@
-/* TKOM21Z - Język z czasem
- * Autor: Łukasz Reszka (300257)
- * */
-
 #ifndef JEZYK_Z_CZASEM_CHARANDPOSITION_H
 #define JEZYK_Z_CZASEM_CHARANDPOSITION_H
 

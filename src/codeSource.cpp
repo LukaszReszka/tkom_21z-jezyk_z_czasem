@@ -1,7 +1,3 @@
-/* TKOM21Z - Język z czasem
- * Autor: Łukasz Reszka (300257)
- * */
-
 #include "codeSource.h"
 #include <iostream>
 
