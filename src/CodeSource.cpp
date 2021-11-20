@@ -2,7 +2,7 @@
  * Autor: Łukasz Reszka (300257)
  * */
 
-#include "../headers/CodeSource.h"
+#include "CodeSource.h"
 #include <iostream>
 
 
@@ -25,7 +25,7 @@ CodeSource::CodeSource(std::string &file_name) {
     getCharFunc = &CodeSource::getCharFromFile;
 }
 
-CodeSource::CodeSource(std::vector <std::string>
+CodeSource::CodeSource(std::vector<std::string>
                        &code_lines) {
     commands = code_lines;
     getCharFunc = &CodeSource::getCharFromTerminal;
@@ -42,12 +42,12 @@ CharAndPosition CodeSource::getCharFromFile() {
     source_file.get(c);
 
     if (source_file.eof()) {
-        CharAndPosition eofChar(line, column);
+        CharAndPosition eofChar(line + 1, column + 1);
         source_file.close();
         return eofChar;
     }
 
-    CharAndPosition readChar(c, line, column);
+    CharAndPosition readChar(c, line + 1, column + 1);
     ++column;
     if (c == '\n') {
         ++line;
@@ -59,13 +59,13 @@ CharAndPosition CodeSource::getCharFromFile() {
 
 CharAndPosition CodeSource::getCharFromTerminal() {
     if (column == 0 && commands[line] == FINISH_TYPING_SYMBOL) {
-        CharAndPosition eofChar(line, column);
+        CharAndPosition eofChar(line + 1, column + 1);
         commands.clear();
         return eofChar;
     }
 
     char c = commands[line][column];
-    CharAndPosition readChar(c, line, column);
+    CharAndPosition readChar(c, line + 1, column + 1);
     ++column;
     if (column >= commands[line].size()) {
         ++line;
