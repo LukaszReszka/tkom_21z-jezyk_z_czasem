@@ -1,10 +1,10 @@
 #include "../libs/doctest/include/doctest.h"
 
-#include "../src/CharAndPosition.h"
+#include "../src/charAndPosition.h"
 
 TEST_SUITE_BEGIN("CharAndPosition class tests");
 
-TEST_CASE("tesing constructors") {
+TEST_CASE("constructors tests") {
 
     SUBCASE("not EOF constructor") {
         CharAndPosition test_struct('a', 1, 2);

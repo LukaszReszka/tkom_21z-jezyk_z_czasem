@@ -2,16 +2,16 @@
  * Autor: Łukasz Reszka (300257)
  * */
 
-#include "CodeSource.h"
+#include "codeSource.h"
 #include <iostream>
 
 
-CodeSource::CodeSource() {
+CodeSource::CodeSource(std::istream &input) {
     std::cout << "\033[33mType code below. To finish program, input \"" + FINISH_TYPING_SYMBOL +
                  "\" in new line.\033[0m" << std::endl;
     std::string code_line;
     do {
-        std::getline(std::cin, code_line);
+        std::getline(input, code_line);
         commands.push_back(code_line);
     } while (code_line != FINISH_TYPING_SYMBOL);
 
@@ -23,12 +23,6 @@ CodeSource::CodeSource(std::string &file_name) {
     if (source_file.fail())
         throw std::exception();
     getCharFunc = &CodeSource::getCharFromFile;
-}
-
-CodeSource::CodeSource(std::vector<std::string>
-                       &code_lines) {
-    commands = code_lines;
-    getCharFunc = &CodeSource::getCharFromTerminal;
 }
 
 CodeSource::~CodeSource() {

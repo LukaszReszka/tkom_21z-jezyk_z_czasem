@@ -3,7 +3,7 @@
  * */
 
 #include <iostream>
-#include "CodeSource.h"
+#include "codeSource.h"
 
 int main(int argc, char **argv) {
     CodeSource *source;
@@ -25,19 +25,10 @@ int main(int argc, char **argv) {
         }
 
     } else if (argc == 1) {     //source code from console
-        source = new CodeSource();
+        source = new CodeSource(std::cin);
     } else {
         std::cerr << "\033[31mToo many arguments - at the most one argument allowed!" << std::endl;
         return -1;
-    }
-
-    while (true) {
-        CharAndPosition res = source->getNextChar();
-        if (res.isEndOfText) {
-            std::cout << "EOF: " << res.isEndOfText << " L: " << res.line << " C: " << res.column << std::endl;
-            break;
-        }
-        std::cout << res.readChar << " L: " << res.line << " C: " << res.column << std::endl;
     }
 
     delete source;

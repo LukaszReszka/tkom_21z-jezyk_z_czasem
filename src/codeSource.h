@@ -7,18 +7,16 @@
 
 #include <fstream>
 #include <vector>
-#include "CharAndPosition.h"
+#include "charAndPosition.h"
 
 const std::string FINISH_TYPING_SYMBOL = "^q";
 
 class CodeSource {
 
 public:
-    CodeSource();
+    CodeSource(std::istream &input);
 
     explicit CodeSource(std::string &file_name);
-
-    explicit CodeSource(std::vector <std::string> &code_lines); //mainly used in unit tests
 
     ~CodeSource();
 
@@ -31,7 +29,7 @@ private:
 
     std::fstream source_file;
 
-    std::vector <std::string> commands;
+    std::vector<std::string> commands;
 
     CharAndPosition (CodeSource::*getCharFunc)();   //pointer to chosen function
 
