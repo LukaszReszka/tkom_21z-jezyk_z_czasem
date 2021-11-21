@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "codeSource.h"
+#include "lexer.h"
 
 int main(int argc, char **argv) {
     CodeSource *source;
@@ -30,7 +31,7 @@ int main(int argc, char **argv) {
         std::cerr << "\033[31mToo many arguments - at the most one argument allowed!" << std::endl;
         return -1;
     }
-    
+
     delete source;
     return 0;
 }

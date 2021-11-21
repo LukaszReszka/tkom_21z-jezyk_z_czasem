@@ -4,7 +4,10 @@ project(Jezyk_z_czasem)
 add_library(exec_and_test STATIC
         codeSource.h
         codeSource.cpp
-        charAndPosition.h)
+        charAndPosition.h
+        token.h
+        timeMoment.h
+        timePeriod.h lexer.cpp lexer.h)
 target_include_directories(exec_and_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # The main program
