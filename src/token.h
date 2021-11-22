@@ -6,7 +6,7 @@
 #include "timeMoment.h"
 #include "timePeriod.h"
 
-enum token_type {
+enum token_type {       // all white chars and comments # ... # are skipped
     T_FUNC,             //keywords
     T_IF,
     T_ELSE,
