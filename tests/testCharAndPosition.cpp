@@ -1,6 +1,6 @@
 #include "../libs/doctest/include/doctest.h"
+#include "../src/codeSource/charAndPosition.h"
 
-#include "../src/charAndPosition.h"
 
 TEST_SUITE_BEGIN("CharAndPosition class tests");
 

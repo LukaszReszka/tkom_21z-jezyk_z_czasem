@@ -3,8 +3,8 @@
  * */
 
 #include <iostream>
-#include "codeSource.h"
-#include "lexer.h"
+#include "codeSource/codeSource.h"
+#include "lexer/lexer.h"
 
 int main(int argc, char **argv) {
     CodeSource *source;

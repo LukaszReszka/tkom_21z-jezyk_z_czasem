@@ -5,4 +5,4 @@ add_executable(tests
         testCharAndPosition.cpp
         testCodeSource.cpp)
 
-target_link_libraries(tests PRIVATE exec_and_test doctest)
+target_link_libraries(tests PRIVATE codeSource lexer doctest)

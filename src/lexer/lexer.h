@@ -2,7 +2,7 @@
 #define JEZYK_Z_CZASEM_LEXER_H
 
 #include "token.h"
-#include "codeSource.h"
+#include "../codeSource/codeSource.h"
 #include <map>
 
 class Lexer {

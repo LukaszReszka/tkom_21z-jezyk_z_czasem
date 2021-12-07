@@ -1,7 +1,7 @@
 #include <sstream>
 #include "../libs/doctest/include/doctest.h"
+#include "../src/codeSource/codeSource.h"
 
-#include "../src/codeSource.h"
 
 TEST_SUITE_BEGIN("CodeSource class tests");
 
