@@ -7,7 +7,7 @@
 #include "lexer/lexer.h"
 
 int main(int argc, char **argv) {
-    CodeSource *source;
+    code_source::CodeSource *source;
 
     if (argc == 2) {            //source code from file
 
@@ -19,20 +19,20 @@ int main(int argc, char **argv) {
             return -1;
         }
         try {
-            source = new CodeSource(launch_arg);
+            source = new code_source::CodeSource(launch_arg);
         } catch (...) {
             std::cerr << "\033[31mError - file not found!" << std::endl;
             return -1;
         }
 
     } else if (argc == 1) {     //source code from console
-        source = new CodeSource(std::cin);
+        source = new code_source::CodeSource(std::cin);
     } else {
         std::cerr << "\033[31mToo many arguments - at the most one argument allowed!" << std::endl;
         return -1;
     }
 
-    Lexer lexer(source);
+    lexer::Lexer lexer(source);
 
     //***********************************************************************
     //Ta część jest tylko do testów - później będzie usunięta
@@ -77,13 +77,13 @@ int main(int argc, char **argv) {
     token_names[36] = "T_END";
     token_names[37] = "T_UNKNOWN";
 
-    Token t;
+    lexer::Token t;
     std::cout << "\nRozpoznane tokeny:\n";
 
     do {
         lexer.getNextToken(&t);
         std::cout << token_names[t.type] << std::endl;
-    } while (t.type != T_END);
+    } while (t.type != lexer::T_END);
 
     //***********************************************************************
 

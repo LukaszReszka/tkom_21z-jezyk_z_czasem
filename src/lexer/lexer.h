@@ -5,44 +5,46 @@
 #include "../codeSource/codeSource.h"
 #include <map>
 
-class Lexer {
+namespace lexer {
 
-public:
-    Lexer(CodeSource *s);
+    class Lexer {
 
-    ~Lexer() { delete source; }
+    public:
+        Lexer(code_source::CodeSource *s);
 
-    void getNextToken(Token *token);
+        ~Lexer() { delete source; }
 
-private:
-    CodeSource *source;
-    CharAndPosition buf;
-    bool must_read_buf_again = false;
-    std::map<char, void (*)(Token *)> single_char_token;   //maps first read char to proper function/lambda
-    std::map<std::string, void (*)(Token *)> key_words;
+        void getNextToken(Token *token);
 
-    inline void setNextChar() { buf = source->getNextChar(); }
+    private:
+        code_source::CodeSource *source;
+        code_source::CharAndPosition buf;
+        bool must_read_buf_again = false;
+        std::map<char, void (*)(Token *)> single_char_token;   //maps first read char to proper function/lambda
+        std::map<std::string, void (*)(Token *)> key_words;
 
-    void assignOrComparisonOperatorToken(Token *token);
+        inline void setNextChar() { buf = source->getNextChar(); }
 
-    void greaterOperatorToken(Token *token);
+        void assignOrComparisonOperatorToken(Token *token);
 
-    void lesserOperatorToken(Token *token);
+        void greaterOperatorToken(Token *token);
 
-    void unitOrTimeMomentToken(Token *token);
+        void lesserOperatorToken(Token *token);
 
-    void unitToken(Token *token);
+        void unitOrTimeMomentToken(Token *token);
 
-    void stringToken(Token *token);
+        void unitToken(Token *token);
 
-    void skipWhiteCharsAndComment();
+        void stringToken(Token *token);
 
-    void identifierToken(Token *token);
+        void skipWhiteCharsAndComment();
 
-    void numberToken(Token *token);
+        void identifierToken(Token *token);
 
-    void addFractionalPart(Token *token, int int_part);
-};
+        void numberToken(Token *token);
 
+        void addFractionalPart(Token *token, int int_part);
+    };
+}
 
 #endif //JEZYK_Z_CZASEM_LEXER_H

@@ -5,34 +5,36 @@
 #include <vector>
 #include "charAndPosition.h"
 
-const std::string FINISH_TYPING_SYMBOL = "^q";
+namespace code_source {
 
-class CodeSource {
+    const std::string FINISH_TYPING_SYMBOL = "^q";
 
-public:
-    explicit CodeSource(std::istream &input);
+    class CodeSource {
 
-    explicit CodeSource(std::string &file_name);
+    public:
+        explicit CodeSource(std::istream &input);
 
-    ~CodeSource();
+        explicit CodeSource(std::string &file_name);
 
-    CharAndPosition getNextChar() { return (this->*getCharFunc)(); }
+        ~CodeSource();
 
-private:
-    uint line = 0;
+        CharAndPosition getNextChar() { return (this->*getCharFunc)(); }
 
-    uint column = 0;
+    private:
+        uint line = 0;
 
-    std::fstream source_file;
+        uint column = 0;
 
-    std::vector<std::string> commands;
+        std::fstream source_file;
 
-    CharAndPosition (CodeSource::*getCharFunc)();   //pointer to chosen function
+        std::vector<std::string> commands;
 
-    CharAndPosition getCharFromFile();
+        CharAndPosition (CodeSource::*getCharFunc)();   //pointer to chosen function
 
-    CharAndPosition getCharFromTerminal();
-};
+        CharAndPosition getCharFromFile();
 
+        CharAndPosition getCharFromTerminal();
+    };
+}
 
 #endif //JEZYK_Z_CZASEM_CODESOURCE_H

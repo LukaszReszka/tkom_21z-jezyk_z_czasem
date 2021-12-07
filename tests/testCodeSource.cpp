@@ -16,11 +16,11 @@ TEST_CASE("getNextChar() method test - code from file") {
     source_file << code;
     source_file.close();
 
-    CodeSource *source;
-    REQUIRE_NOTHROW(source = new CodeSource(file_name));
+    code_source::CodeSource *source;
+    REQUIRE_NOTHROW(source = new code_source::CodeSource(file_name));
 
     for (int i = 0; i < 10; ++i) {
-        CharAndPosition singleChar = source->getNextChar();
+        code_source::CharAndPosition singleChar = source->getNextChar();
         CHECK_EQ(code[i], singleChar.readChar);
         CHECK_EQ(lin, singleChar.line);
         CHECK_EQ(col, singleChar.column);
@@ -33,7 +33,7 @@ TEST_CASE("getNextChar() method test - code from file") {
         }
     }
 
-    CharAndPosition singleChar = source->getNextChar();
+    code_source::CharAndPosition singleChar = source->getNextChar();
     CHECK_EQ(4, singleChar.line);
     CHECK_EQ(1, singleChar.column);
     CHECK_EQ(true, singleChar.isEndOfText);
@@ -46,9 +46,9 @@ TEST_CASE("getNextChar() method test - code from terminal") {
     int lin = 1, col = 1;
     std::string code = "ab ; \n x^q\n\n^q";
     std::stringstream user_input_mock(code);
-    CodeSource source(user_input_mock);
+    code_source::CodeSource source(user_input_mock);
     for (int i = 0; i < 10; ++i) {
-        CharAndPosition singleChar = source.getNextChar();
+        code_source::CharAndPosition singleChar = source.getNextChar();
         CHECK_EQ(code[i], singleChar.readChar);
         CHECK_EQ(lin, singleChar.line);
         CHECK_EQ(col, singleChar.column);
@@ -61,7 +61,7 @@ TEST_CASE("getNextChar() method test - code from terminal") {
             ++col;
         }
     }
-    CharAndPosition singleChar = source.getNextChar();
+    code_source::CharAndPosition singleChar = source.getNextChar();
     CHECK_EQ('\0', singleChar.readChar);
     CHECK_EQ(3, singleChar.line);
     CHECK_EQ(1, singleChar.column);

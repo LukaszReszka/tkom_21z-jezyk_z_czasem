@@ -3,32 +3,35 @@
 
 #include <ctime>
 
-struct TimeMoment {
-    std::tm moment;
+namespace lexer {
 
-    int getYear() {
-        return moment.tm_year;
-    }
+    struct TimeMoment {
+        std::tm moment;
 
-    int getMonth() {
-        return moment.tm_mon;
-    }
+        int getYear() {
+            return moment.tm_year;
+        }
 
-    int getDay() {
-        return moment.tm_mday;
-    }
+        int getMonth() {
+            return moment.tm_mon;
+        }
 
-    int getHour() {
-        return moment.tm_hour;
-    }
+        int getDay() {
+            return moment.tm_mday;
+        }
 
-    int getMin() {
-        return moment.tm_min;
-    }
+        int getHour() {
+            return moment.tm_hour;
+        }
 
-    int getSec() {
-        return moment.tm_sec;
-    }
-};
+        int getMin() {
+            return moment.tm_min;
+        }
+
+        int getSec() {
+            return moment.tm_sec;
+        }
+    };
+}
 
 #endif //JEZYK_Z_CZASEM_TIMEMOMENT_H
