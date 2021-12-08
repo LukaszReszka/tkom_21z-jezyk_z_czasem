@@ -5,6 +5,7 @@
 #include <string>
 #include "timeMoment.h"
 #include "timePeriod.h"
+#include "../codeSource/position.h"
 
 namespace lexer {
 
@@ -50,7 +51,7 @@ namespace lexer {
     };
 
     struct Token {
-        uint line, column;
+        code_source::Position position;
         token_type type;
         std::variant<int, double, std::string, TimeMoment, TimePeriod> value;
     };

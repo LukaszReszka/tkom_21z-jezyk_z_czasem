@@ -5,6 +5,6 @@ add_library(codeSource STATIC
         codeSource.h
         codeSource.cpp
         charAndPosition.h
-        )
+        position.h)
 
 target_include_directories(codeSource PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

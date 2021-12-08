@@ -3,24 +3,24 @@
 namespace lexer {
 
     Lexer::Lexer(code_source::CodeSource *s) : source(s) {
-        single_char_token['+'] = [](Token *token) { token->type = T_PLUS; };
-        single_char_token['-'] = [](Token *token) { token->type = T_MINUS; };
-        single_char_token['*'] = [](Token *token) { token->type = T_MULTIPLY; };
-        single_char_token['/'] = [](Token *token) { token->type = T_DIVIDE; };
-        single_char_token['&'] = [](Token *token) { token->type = T_AND; };
-        single_char_token['|'] = [](Token *token) { token->type = T_OR; };
-        single_char_token['('] = [](Token *token) { token->type = T_PARENTHESES_1; };
-        single_char_token[')'] = [](Token *token) { token->type = T_PARENTHESES_2; };
-        single_char_token['{'] = [](Token *token) { token->type = T_BRACE_1; };
-        single_char_token['}'] = [](Token *token) { token->type = T_BRACE_2; };
-        single_char_token[','] = [](Token *token) { token->type = T_COMMA; };
-        single_char_token[';'] = [](Token *token) { token->type = T_SEMICOLON; };
+        single_char_token['+'] = T_PLUS;
+        single_char_token['-'] = T_MINUS;
+        single_char_token['*'] = T_MULTIPLY;
+        single_char_token['/'] = T_DIVIDE;
+        single_char_token['&'] = T_AND;
+        single_char_token['|'] = T_OR;
+        single_char_token['('] = T_PARENTHESES_1;
+        single_char_token[')'] = T_PARENTHESES_2;
+        single_char_token['{'] = T_BRACE_1;
+        single_char_token['}'] = T_BRACE_2;
+        single_char_token[','] = T_COMMA;
+        single_char_token[';'] = T_SEMICOLON;
 
-        key_words["FUNC"] = [](Token *token) { token->type = T_FUNC; };
-        key_words["if"] = [](Token *token) { token->type = T_IF; };
-        key_words["else"] = [](Token *token) { token->type = T_ELSE; };
-        key_words["while"] = [](Token *token) { token->type = T_WHILE; };
-        key_words["RET"] = [](Token *token) { token->type = T_RET; };
+        key_words["FUNC"] = T_FUNC;
+        key_words["if"] = T_IF;
+        key_words["else"] = T_ELSE;
+        key_words["while"] = T_WHILE;
+        key_words["RET"] = T_RET;
     }
 
     void Lexer::getNextToken(Token *token) {
@@ -32,8 +32,7 @@ namespace lexer {
 
         skipWhiteCharsAndComment();
 
-        token->column = buf.column;
-        token->line = buf.line;
+        token->position = buf.position;
 
         if (buf.isEndOfText) {
             token->type = T_END;
@@ -42,7 +41,7 @@ namespace lexer {
 
         auto func = single_char_token.find(buf.readChar);
         if (func != single_char_token.end()) {
-            func->second(token);
+            token->type = func->second;
             return;
         }
 

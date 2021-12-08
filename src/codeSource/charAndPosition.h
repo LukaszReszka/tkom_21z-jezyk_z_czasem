@@ -1,6 +1,8 @@
 #ifndef JEZYK_Z_CZASEM_CHARANDPOSITION_H
 #define JEZYK_Z_CZASEM_CHARANDPOSITION_H
 
+#include "position.h"
+
 namespace code_source {
 
     typedef unsigned int uint;
@@ -8,16 +10,15 @@ namespace code_source {
     struct CharAndPosition {
         char readChar;
         bool isEndOfText;
-        uint column;
-        uint line;
+        Position position;
 
         CharAndPosition() {}
 
         CharAndPosition(char c, uint lin, uint col) : readChar(c), isEndOfText(false),
-                                                      column(col), line(lin) {}
+                                                      position(lin, col) {}
 
         CharAndPosition(uint lin, uint col) : readChar('$'), isEndOfText(true),
-                                              column(col), line(lin) {}
+                                              position(lin, col) {}
     };
 }
 
