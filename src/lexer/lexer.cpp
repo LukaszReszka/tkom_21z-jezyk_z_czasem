@@ -172,7 +172,7 @@ namespace lexer {
                     token->type = T_UNKNOWN;
                     token->value = res;
                     return;
-                }
+                } else c = '\"';
             }
             res += c;
             source.skipChar();
@@ -201,13 +201,10 @@ namespace lexer {
             do {
                 current_char = source.getNextChar();
             } while (!current_char.isEndOfText && current_char.value != '#');
-            if (current_char.value == '#')
-                current_char = source.peekNextChar();
         }
 
-        if (isspace(current_char.value) || current_char.value == ' ' || current_char.value == '#') {
-            if (current_char.value == '#')
-                source.skipChar();
+        if (current_char.value == '#') {
+            current_char = source.getNextChar();
             skipWhiteCharsAndComment();
         }
     }
@@ -221,7 +218,13 @@ namespace lexer {
             res += current_char.value;
             current_char = source.peekNextChar();
         }
-        token->type = T_IDENTIFIER;
+
+        auto func = key_words.find(res);
+        if (func != key_words.end()) {
+            token->type = func->second;
+        } else {
+            token->type = T_IDENTIFIER;
+        }
         token->value = res;
     }
 
