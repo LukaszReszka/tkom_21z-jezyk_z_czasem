@@ -1,39 +1,27 @@
 #ifndef JEZYK_Z_CZASEM_CODESOURCE_H
 #define JEZYK_Z_CZASEM_CODESOURCE_H
 
-#include <fstream>
-#include <vector>
+#include <istream>
 #include "charAndPosition.h"
 
 namespace code_source {
 
-    const std::string FINISH_TYPING_SYMBOL = "^q";
-
     class CodeSource {
 
     public:
-        explicit CodeSource(std::istream &input);
+        CodeSource(std::istream &input) : source(input) {}
 
-        explicit CodeSource(std::string &file_name);
+        CharAndPosition getNextChar();
 
-        ~CodeSource();
+        CharAndPosition peekNextChar();
 
-        CharAndPosition getNextChar() { return (this->*getCharFunc)(); }
+        inline void skipChar() { source.get(); }
 
     private:
         uint line = 0;
-
         uint column = 0;
 
-        std::fstream source_file;
-
-        std::vector<std::string> commands;
-
-        CharAndPosition (CodeSource::*getCharFunc)();   //pointer to chosen function
-
-        CharAndPosition getCharFromFile();
-
-        CharAndPosition getCharFromTerminal();
+        std::istream &source;
     };
 }
 

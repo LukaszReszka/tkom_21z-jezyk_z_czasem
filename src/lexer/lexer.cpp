@@ -2,7 +2,7 @@
 
 namespace lexer {
 
-    Lexer::Lexer(code_source::CodeSource *s) : source(s) {
+    Lexer::Lexer(code_source::CodeSource s) : source(s) {
         single_char_token['+'] = T_PLUS;
         single_char_token['-'] = T_MINUS;
         single_char_token['*'] = T_MULTIPLY;
@@ -24,28 +24,24 @@ namespace lexer {
     }
 
     void Lexer::getNextToken(Token *token) {
-        if (!must_read_buf_again) {
-            setNextChar();
-        } else {
-            must_read_buf_again = false;
-        }
+        current_char = source.getNextChar();
 
         skipWhiteCharsAndComment();
 
-        token->position = buf.position;
+        token->position = current_char.position;
 
-        if (buf.isEndOfText) {
+        if (current_char.isEndOfText) {
             token->type = T_END;
             return;
         }
 
-        auto func = single_char_token.find(buf.readChar);
+        auto func = single_char_token.find(current_char.value);
         if (func != single_char_token.end()) {
             token->type = func->second;
             return;
         }
 
-        switch (buf.readChar) {
+        switch (current_char.value) {
             case '=':
                 assignOrComparisonOperatorToken(token);
                 return;
@@ -67,73 +63,74 @@ namespace lexer {
                 return;
         }
 
-        if (isalpha(buf.readChar)) {
+        if (isalpha(current_char.value)) {
             identifierToken(token);
             return;
         }
 
-        if (isdigit(buf.readChar)) {
+        if (isdigit(current_char.value)) {
             numberToken(token);
             return;
         }
 
         token->type = T_UNKNOWN;
-        token->value = "" + buf.readChar;
+        token->value = "" + current_char.value;
     }
 
     void Lexer::assignOrComparisonOperatorToken(Token *token) {
-        setNextChar();
-        char c = buf.readChar;
-        if (c == '=') {
+        current_char = source.peekNextChar();
+        if (current_char.value == '=') {
             token->type = T_EQUAL;
-        } else if (c == '\\') {
-            setNextChar();
-            if (buf.readChar == '=') {
+            source.skipChar();
+        } else if (current_char.value == '\\') {
+            source.skipChar();
+            current_char = source.peekNextChar();
+            if (current_char.value == '=') {
                 token->type = T_NOT_EQUAL;
+                source.skipChar();
             } else {
                 token->type = T_UNKNOWN;
                 token->value = "=\\";
-                must_read_buf_again = true;
             }
         } else {
             token->type = T_ASSIGN;
-            must_read_buf_again = true;
         }
     }
 
     void Lexer::greaterOperatorToken(Token *token) {
-        setNextChar();
-        if (buf.readChar == '=') {
+        current_char = source.peekNextChar();
+        if (current_char.value == '=') {
             token->type = T_GREATER_E;
+            source.skipChar();
         } else {
             token->type = T_GREATER;
-            must_read_buf_again = true;
         }
     }
 
     void Lexer::lesserOperatorToken(Token *token) {
-        setNextChar();
-        if (buf.readChar == '=') {
+        current_char = source.peekNextChar();
+        if (current_char.value == '=') {
             token->type = T_LESSER_E;
+            source.skipChar();
         } else {
             token->type = T_LESSER;
-            must_read_buf_again = true;
         }
     }
 
     void Lexer::unitOrTimeMomentToken(Token *token) {
-        setNextChar();
-        if (!isdigit(buf.readChar)) {
+        current_char = source.peekNextChar();
+        if (!isdigit(current_char.value)) {
+            source.skipChar();
             unitToken(token);
         } else {
-
+            //body - tokeny datowe ...
         }
     }
 
     void Lexer::unitToken(Token *token) {
-        char unit_char = buf.readChar;
-        setNextChar();
-        if (buf.readChar == ']') {
+        char unit_char = current_char.value;
+        current_char = source.peekNextChar();
+        if (current_char.value == ']') {
             switch (unit_char) {
                 case 's':
                     token->type = T_SEC_U;
@@ -155,90 +152,92 @@ namespace lexer {
                     token->type = T_UNKNOWN;
                     std::string res = "[" + unit_char;
                     token->value = res + "]";
-                    return;
                 }
             }
+            source.skipChar();
         } else {
             token->type = T_UNKNOWN;
             token->value = "[" + unit_char;
-            must_read_buf_again = true;
         }
     }
 
     void Lexer::stringToken(Token *token) {
         std::string res = "";
-        setNextChar();
-        char c = buf.readChar;
+        current_char = source.peekNextChar();
+        char c = current_char.value;
         while (isalnum(c) || c == ' ' || c == '\t' || c == '\\') {
             if (c == '\\') {
-                setNextChar();
-                if (buf.readChar != '\"') {
+                source.skipChar();
+                current_char = source.peekNextChar();
+                if (current_char.value != '\"') {
                     res += '\\';
                     token->type = T_UNKNOWN;
                     token->value = res;
-                    must_read_buf_again = true;
                     return;
                 }
             }
             res += c;
-            setNextChar();
-            c = buf.readChar;
+            source.skipChar();
+            current_char = source.peekNextChar();
+            c = current_char.value;
         }
 
         if (c == '\"') {
             token->type = T_STRING;
             token->value = res;
+            source.skipChar();
         } else {
             token->type = T_UNKNOWN;
             token->value = res;
-            must_read_buf_again = true;
         }
     }
 
     void Lexer::skipWhiteCharsAndComment() {
-        if (buf.isEndOfText) return;
+        if (current_char.isEndOfText) return;
 
-        while (isspace(buf.readChar) || buf.readChar == ' ') {
-            setNextChar();
+        while (isspace(current_char.value) || current_char.value == ' ') {
+            current_char = source.getNextChar();
         }
 
-        if (buf.readChar == '#') {
+        if (current_char.value == '#') {
             do {
-                setNextChar();
-            } while (!buf.isEndOfText && buf.readChar != '#');
-            if (buf.readChar == '#')
-                setNextChar();
+                current_char = source.getNextChar();
+            } while (!current_char.isEndOfText && current_char.value != '#');
+            if (current_char.value == '#')
+                current_char = source.peekNextChar();
         }
 
-        if (buf.isEndOfText) return;
-
-        if (isspace(buf.readChar) || buf.readChar == ' ' || buf.readChar == '#')
+        if (isspace(current_char.value) || current_char.value == ' ' || current_char.value == '#') {
+            if (current_char.value == '#')
+                source.skipChar();
             skipWhiteCharsAndComment();
+        }
     }
 
     void Lexer::identifierToken(Token *token) {
         std::string res = "";
-        res += buf.readChar;
-        setNextChar();
-        while (isalnum(buf.readChar) || buf.readChar == '_') {
-            res += buf.readChar;
-            setNextChar();
+        res += current_char.value;
+        current_char = source.peekNextChar();
+        while (isalnum(current_char.value) || current_char.value == '_') {
+            source.skipChar();
+            res += current_char.value;
+            current_char = source.peekNextChar();
         }
-        must_read_buf_again = true;
         token->type = T_IDENTIFIER;
         token->value = res;
     }
 
     void Lexer::numberToken(Token *token) {
-        int res = buf.readChar - '0';
+        int res = current_char.value - '0';
         if (res == 0) {
-            setNextChar();
+            current_char = source.peekNextChar();
             addFractionalPart(token, res);
         } else {
-            setNextChar();
-            while (isdigit(buf.readChar)) {
-                res = 10 * res + (buf.readChar - '0');
-                setNextChar();
+            current_char = source.peekNextChar();
+            while (isdigit(current_char.value)) {
+                source.skipChar();
+                res = 10 * res + (current_char.value - '0');
+                current_char = source.peekNextChar();
             }
             addFractionalPart(token, res);
         }
@@ -246,13 +245,15 @@ namespace lexer {
 
     void Lexer::addFractionalPart(Token *token, int int_part) {
         int frac = 0;
-        if (buf.readChar == '.') {
-            setNextChar();
-            if (isdigit(buf.readChar)) {
+        if (current_char.value == '.') {
+            source.skipChar();
+            current_char = source.peekNextChar();
+            if (isdigit(current_char.value)) {
                 uint n = 10;
-                while (isdigit(buf.readChar)) {
-                    frac = frac * 10 + (buf.readChar - '0');
-                    setNextChar();
+                while (isdigit(current_char.value)) {
+                    frac = frac * 10 + (current_char.value - '0');
+                    source.skipChar();
+                    current_char = source.peekNextChar();
                     n *= 10;
                 }
                 double result = int_part + (frac / n);
@@ -266,6 +267,5 @@ namespace lexer {
             token->type = T_INT;
             token->value = 0;
         }
-        must_read_buf_again = true;
     }
 }

@@ -7,4 +7,4 @@ add_subdirectory(lexer/)
 add_executable(tln
         main.cpp)
 
-target_link_libraries(tln PRIVATE codeSource lexer)
+target_link_libraries(tln PRIVATE lexer codeSource)

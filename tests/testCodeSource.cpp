@@ -21,7 +21,7 @@ TEST_CASE("getNextChar() method test - code from file") {
 
     for (int i = 0; i < 10; ++i) {
         code_source::CharAndPosition singleChar = source->getNextChar();
-        CHECK_EQ(code[i], singleChar.readChar);
+        CHECK_EQ(code[i], singleChar.value);
         CHECK_EQ(lin, singleChar.line);
         CHECK_EQ(col, singleChar.column);
         CHECK_EQ(false, singleChar.isEndOfText);
@@ -49,7 +49,7 @@ TEST_CASE("getNextChar() method test - code from terminal") {
     code_source::CodeSource source(user_input_mock);
     for (int i = 0; i < 10; ++i) {
         code_source::CharAndPosition singleChar = source.getNextChar();
-        CHECK_EQ(code[i], singleChar.readChar);
+        CHECK_EQ(code[i], singleChar.value);
         CHECK_EQ(lin, singleChar.line);
         CHECK_EQ(col, singleChar.column);
         CHECK_EQ(false, singleChar.isEndOfText);
@@ -62,7 +62,7 @@ TEST_CASE("getNextChar() method test - code from terminal") {
         }
     }
     code_source::CharAndPosition singleChar = source.getNextChar();
-    CHECK_EQ('\0', singleChar.readChar);
+    CHECK_EQ('\0', singleChar.value);
     CHECK_EQ(3, singleChar.line);
     CHECK_EQ(1, singleChar.column);
     CHECK_EQ(false, singleChar.isEndOfText);

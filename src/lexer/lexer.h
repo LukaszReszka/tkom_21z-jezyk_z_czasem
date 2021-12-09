@@ -10,20 +10,15 @@ namespace lexer {
     class Lexer {
 
     public:
-        Lexer(code_source::CodeSource *s);
-
-        ~Lexer() { delete source; }
+        Lexer(code_source::CodeSource s);
 
         void getNextToken(Token *token);
 
     private:
-        code_source::CodeSource *source;
-        code_source::CharAndPosition buf;
-        bool must_read_buf_again = false;
+        code_source::CodeSource source;
+        code_source::CharAndPosition current_char;
         std::map<char, token_type> single_char_token;   //maps first read char to proper function/lambda
         std::map<std::string, token_type> key_words;
-
-        inline void setNextChar() { buf = source->getNextChar(); }
 
         void assignOrComparisonOperatorToken(Token *token);
 
