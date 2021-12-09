@@ -12,20 +12,20 @@ namespace lexer {
     public:
         Lexer(code_source::CodeSource s);
 
-        void getNextToken(Token *token);
+        Token getNextToken();
 
     private:
         code_source::CodeSource source;
         code_source::CharAndPosition current_char;
-        std::map<char, token_type> single_char_token;   //maps first read char to proper function/lambda
+        std::map<char, token_type> single_char_token;
         std::map<std::string, token_type> key_words;
+
+        bool isMultipleCharToken(Token *token);
 
         void assignOrComparisonOperatorToken(Token *token);
 
-        void greaterOperatorToken(Token *token);
-
-        void lesserOperatorToken(Token *token);
-
+        void greaterLessOrEqualOperatorToken(Token *token, token_type cannot_be_equal, token_type can_be_equal);
+        
         void unitOrTimeMomentToken(Token *token);
 
         void unitToken(Token *token);

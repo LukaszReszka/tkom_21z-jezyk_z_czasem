@@ -38,8 +38,8 @@ namespace lexer {
         T_NOT_EQUAL,        // =\=
         T_GREATER,          // >
         T_GREATER_E,        // >=
-        T_LESSER,           // <
-        T_LESSER_E,         // <=
+        T_LESS,           // <
+        T_LESS_E,         // <=
         T_SEMICOLON,
         T_COMMA,
         T_PARENTHESES_1,    // (
@@ -47,6 +47,7 @@ namespace lexer {
         T_BRACE_1,          // {
         T_BRACE_2,          // }
         T_END,              //EOF or ^q
+        T_NUMBER_TOO_LARGE,
         T_UNKNOWN
     };
 

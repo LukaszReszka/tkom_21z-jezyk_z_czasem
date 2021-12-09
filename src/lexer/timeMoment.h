@@ -8,27 +8,27 @@ namespace lexer {
     struct TimeMoment {
         std::tm moment;
 
-        int getYear() {
+        int getYear() const {
             return moment.tm_year;
         }
 
-        int getMonth() {
+        int getMonth() const {
             return moment.tm_mon;
         }
 
-        int getDay() {
+        int getDay() const {
             return moment.tm_mday;
         }
 
-        int getHour() {
+        int getHour() const {
             return moment.tm_hour;
         }
 
-        int getMin() {
+        int getMin() const {
             return moment.tm_min;
         }
 
-        int getSec() {
+        int getSec() const {
             return moment.tm_sec;
         }
     };

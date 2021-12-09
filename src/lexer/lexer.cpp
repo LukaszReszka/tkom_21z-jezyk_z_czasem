@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include <climits>
 
 namespace lexer {
 
@@ -23,58 +24,65 @@ namespace lexer {
         key_words["RET"] = T_RET;
     }
 
-    void Lexer::getNextToken(Token *token) {
+    Token Lexer::getNextToken() {
         current_char = source.getNextChar();
-
+        Token token;
         skipWhiteCharsAndComment();
 
-        token->position = current_char.position;
+        token.position = current_char.position;
 
         if (current_char.isEndOfText) {
-            token->type = T_END;
-            return;
+            token.type = T_END;
+            return token;
         }
 
         auto func = single_char_token.find(current_char.value);
         if (func != single_char_token.end()) {
-            token->type = func->second;
-            return;
+            token.type = func->second;
+            return token;
         }
 
+        if (isMultipleCharToken(&token))
+            return token;
+
+        token.type = T_UNKNOWN;
+        token.value = "" + current_char.value;
+        return token;
+    }
+
+    bool Lexer::isMultipleCharToken(Token *token) {
         switch (current_char.value) {
             case '=':
                 assignOrComparisonOperatorToken(token);
-                return;
+                return true;
 
             case '>':
-                greaterOperatorToken(token);
-                return;
+                greaterLessOrEqualOperatorToken(token, T_GREATER, T_GREATER_E);
+                return true;
 
             case '<':
-                lesserOperatorToken(token);
-                return;
+                greaterLessOrEqualOperatorToken(token, T_LESS, T_LESS_E);
+                return true;
 
             case '[':
                 unitOrTimeMomentToken(token);
-                return;
+                return true;
 
             case '"':
                 stringToken(token);
-                return;
+                return true;
         }
 
         if (isalpha(current_char.value)) {
             identifierToken(token);
-            return;
+            return true;
         }
 
         if (isdigit(current_char.value)) {
             numberToken(token);
-            return;
+            return true;
         }
-
-        token->type = T_UNKNOWN;
-        token->value = "" + current_char.value;
+        return false;
     }
 
     void Lexer::assignOrComparisonOperatorToken(Token *token) {
@@ -97,23 +105,13 @@ namespace lexer {
         }
     }
 
-    void Lexer::greaterOperatorToken(Token *token) {
+    void Lexer::greaterLessOrEqualOperatorToken(Token *token, token_type cannot_be_equal, token_type can_be_equal) {
         current_char = source.peekNextChar();
         if (current_char.value == '=') {
-            token->type = T_GREATER_E;
+            token->type = can_be_equal;
             source.skipChar();
         } else {
-            token->type = T_GREATER;
-        }
-    }
-
-    void Lexer::lesserOperatorToken(Token *token) {
-        current_char = source.peekNextChar();
-        if (current_char.value == '=') {
-            token->type = T_LESSER_E;
-            source.skipChar();
-        } else {
-            token->type = T_LESSER;
+            token->type = cannot_be_equal;
         }
     }
 
@@ -229,6 +227,7 @@ namespace lexer {
 
     void Lexer::numberToken(Token *token) {
         int res = current_char.value - '0';
+        bool to_large_number = false;
         if (res == 0) {
             current_char = source.peekNextChar();
             addFractionalPart(token, res);
@@ -236,10 +235,18 @@ namespace lexer {
             current_char = source.peekNextChar();
             while (isdigit(current_char.value)) {
                 source.skipChar();
-                res = 10 * res + (current_char.value - '0');
-                current_char = source.peekNextChar();
+                if ((INT_MAX / 10 < res) || (INT_MAX / 10 == res && INT_MAX % 10 < (current_char.value - '0'))) {
+                    token->type = T_NUMBER_TOO_LARGE;
+                    token->value = "TOO LARGE";
+                    to_large_number = true;
+                    break;
+                } else {
+                    res = 10 * res + (current_char.value - '0');
+                    current_char = source.peekNextChar();
+                }
             }
-            addFractionalPart(token, res);
+            if (!to_large_number)
+                addFractionalPart(token, res);
         }
     }
 
@@ -249,23 +256,28 @@ namespace lexer {
             source.skipChar();
             current_char = source.peekNextChar();
             if (isdigit(current_char.value)) {
-                uint n = 10;
+                double n = 1;
                 while (isdigit(current_char.value)) {
-                    frac = frac * 10 + (current_char.value - '0');
                     source.skipChar();
-                    current_char = source.peekNextChar();
-                    n *= 10;
+                    if ((INT_MAX / 10 < frac) || (INT_MAX / 10 == frac && INT_MAX % 10 < (current_char.value - '0'))) {
+                        token->type = T_NUMBER_TOO_LARGE;
+                        token->value = "TOO LARGE";
+                        return;
+                    } else {
+                        frac = frac * 10 + (current_char.value - '0');
+                        current_char = source.peekNextChar();
+                        n *= 10;
+                    }
                 }
+
                 double result = int_part + (frac / n);
                 token->type = T_DOUBLE;
                 token->value = result;
-            } else {
-                token->type = T_INT;
-                token->value = 0;
+                return;
             }
-        } else {
-            token->type = T_INT;
-            token->value = 0;
         }
+
+        token->type = T_INT;
+        token->value = int_part;
     }
 }

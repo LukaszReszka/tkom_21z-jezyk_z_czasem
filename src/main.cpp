@@ -42,8 +42,8 @@ int main() {
     token_names[25] = "T_NOT_EQUAL";
     token_names[26] = "T_GREATER";
     token_names[27] = "T_GREATER_E";
-    token_names[28] = "T_LESSER";
-    token_names[28] = "T_LESSER_E";
+    token_names[28] = "T_LESS";
+    token_names[29] = "T_LESS_E";
     token_names[30] = "T_SEMICOLON";
     token_names[31] = "T_COMMA";
     token_names[32] = "T_PARENTHESES_1";
@@ -51,15 +51,22 @@ int main() {
     token_names[34] = "T_BRACE_1";
     token_names[35] = "T_BRACE_2";
     token_names[36] = "T_END";
-    token_names[37] = "T_UNKNOWN";
+    token_names[37] = "T_NUMBER_TO_LARGE";
+    token_names[38] = "T_UNKNOWN";
 
-    lexer::Token t;
     std::cout << "\nRozpoznane tokeny:\n";
 
-    do {
-        lexer.getNextToken(&t);
-        std::cout << token_names[t.type] << std::endl;
-    } while (t.type != lexer::T_END);
+    lexer::Token t = lexer.getNextToken();
+    while (t.type != lexer::T_END) {
+        std::cout << token_names[t.type] << " : ";
+        if (std::holds_alternative<int>(t.value))
+            std::cout << std::get<int>(t.value) << std::endl;
+        else if (std::holds_alternative<double>(t.value))
+            std::cout << std::get<double>(t.value) << std::endl;
+        else if (std::holds_alternative<std::string>(t.value))
+            std::cout << std::get<std::string>(t.value) << std::endl;
+        t = lexer.getNextToken();
+    }
 
     //***********************************************************************
 
