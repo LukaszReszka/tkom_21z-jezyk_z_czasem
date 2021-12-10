@@ -25,8 +25,8 @@ namespace lexer {
         void assignOrComparisonOperatorToken(Token *token);
 
         void greaterLessOrEqualOperatorToken(Token *token, token_type cannot_be_equal, token_type can_be_equal);
-        
-        void unitOrTimeMomentToken(Token *token);
+
+        void unitOrTimeToken(Token *token);
 
         void unitToken(Token *token);
 
@@ -39,6 +39,22 @@ namespace lexer {
         void numberToken(Token *token);
 
         void addFractionalPart(Token *token, int int_part);
+
+        void getTimePeriodToken(Token *token);
+
+        void getTimeMomentToken(Token *token);
+
+        void getClockToken(Token *token);
+
+        bool getTime(bool isMax24h, TimeMoment *moment, TimePeriod *period);
+
+        bool getDate(TimeMoment *moment);
+
+        int getHour(bool isMax24h);
+
+        int getMinSecDayOrMonth(int upper_limit, bool isZeroAllowed = true);
+
+        int getYear();
     };
 }
 

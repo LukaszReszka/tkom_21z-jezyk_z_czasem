@@ -65,7 +65,7 @@ namespace lexer {
                 return true;
 
             case '[':
-                unitOrTimeMomentToken(token);
+                unitOrTimeToken(token);
                 return true;
 
             case '"':
@@ -115,14 +115,74 @@ namespace lexer {
         }
     }
 
-    void Lexer::unitOrTimeMomentToken(Token *token) {
+    void Lexer::unitOrTimeToken(Token *token) {
         current_char = source.peekNextChar();
-        if (!isdigit(current_char.value)) {
+        if (current_char.value == '+') {
+            source.skipChar();
+            getTimePeriodToken(token);
+        } else if (current_char.value == '^') {
+            source.skipChar();
+            getClockToken(token);
+        } else if (!isdigit(current_char.value)) {
             source.skipChar();
             unitToken(token);
         } else {
-            //body - tokeny datowe ...
+            getTimeMomentToken(token);
         }
+    }
+
+    void Lexer::getTimePeriodToken(Token *token) {
+        TimePeriod period;
+        if (getTime(false, nullptr, &period)) {
+            current_char = source.peekNextChar();
+            if (current_char.value == ']') {
+                token->type = T_TIME_PERIOD;
+                token->value = period;
+                source.skipChar();
+                return;
+            }
+
+        }
+        token->type = T_UNKNOWN;
+    }
+
+    void Lexer::getClockToken(Token *token) {
+        TimeMoment moment;
+        if (getTime(true, &moment, nullptr)) {
+            current_char = source.peekNextChar();
+            if (current_char.value == ']') {
+                token->type = T_CLOCK;
+                token->value = moment;
+                source.skipChar();
+                return;
+            }
+        }
+        token->type = T_UNKNOWN;
+    }
+
+    void Lexer::getTimeMomentToken(Token *token) {
+        TimeMoment moment;
+        if (getDate(&moment)) {
+            current_char = source.peekNextChar();
+            if (current_char.value == ']') {
+                token->type = T_DATE;
+                token->value = moment;
+                source.skipChar();
+                return;
+            } else if (current_char.value == ' ') {
+                source.skipChar();
+                if (getTime(true, &moment, nullptr)) {
+                    current_char = source.peekNextChar();
+                    if (current_char.value == ']') {
+                        token->type = T_TIMESTAMP;
+                        token->value = moment;
+                        source.skipChar();
+                        return;
+                    }
+                }
+            }
+        }
+        token->type = T_UNKNOWN;
     }
 
     void Lexer::unitToken(Token *token) {
@@ -283,4 +343,134 @@ namespace lexer {
         token->type = T_INT;
         token->value = int_part;
     }
+
+    bool Lexer::getTime(bool isMax24h, TimeMoment *moment, TimePeriod *period) {
+        int h_numb = getHour(isMax24h);
+        current_char = source.peekNextChar();
+        if (h_numb == -1 || current_char.value != ':')
+            return false;
+        source.skipChar();
+        int min_numb = getMinSecDayOrMonth(59);
+        current_char = source.peekNextChar();
+        if (min_numb == -1 || current_char.value != ':')
+            return false;
+        source.skipChar();
+        int sec_numb = getMinSecDayOrMonth(59);
+        if (sec_numb == -1)
+            return false;
+
+        if (isMax24h) {
+            moment->setHour(h_numb);
+            moment->setMin(min_numb);
+            moment->setSec(sec_numb);
+
+        } else {
+            period->h = std::chrono::hours(h_numb);
+            period->m = std::chrono::minutes(min_numb);
+            period->s = std::chrono::seconds(sec_numb);
+        }
+
+        return true;
+    }
+
+    bool Lexer::getDate(TimeMoment *moment) {
+        int day = getMinSecDayOrMonth(31, false);
+        current_char = source.peekNextChar();
+        if (day == -1 || current_char.value != '/')
+            return false;
+        source.skipChar();
+        int month = getMinSecDayOrMonth(12, false);
+        current_char = source.peekNextChar();
+        if (month == -1 || current_char.value != '/')
+            return false;
+        --month;
+        source.skipChar();
+        int year = getYear();
+        if (year == -1)
+            return false;
+
+        moment->setDay(day);
+        moment->setMonth(month);
+        moment->setYear(year);
+
+        return true;
+    }
+
+    int Lexer::getHour(bool isMax24h) {
+        current_char = source.peekNextChar();
+        if (!std::isdigit(current_char.value))
+            return -1;
+
+        source.skipChar();
+        int numb = current_char.value - '0';
+
+        if (!isMax24h && numb == 0)
+            return numb;
+
+        current_char = source.peekNextChar();
+
+        if (isMax24h) {
+            if (!std::isdigit(current_char.value))
+                return -1;
+
+            source.skipChar();
+            numb = 10 * numb + current_char.value - '0';
+
+            if (numb > 23)
+                return -1;
+            else
+                return numb;
+        }
+
+        while (isdigit(current_char.value)) {
+            source.skipChar();
+            if ((INT_MAX / 10 < numb) || (INT_MAX / 10 == numb && INT_MAX % 10 < (current_char.value - '0'))) {
+                return -1;
+            } else {
+                numb = 10 * numb + (current_char.value - '0');
+                current_char = source.peekNextChar();
+            }
+        }
+
+        return numb;
+    }
+
+    int Lexer::getMinSecDayOrMonth(int upper_limit, bool isZeroAllowed) {
+        int numb = 0;
+
+        for (int i = 0; i < 2; ++i) {
+            current_char = source.peekNextChar();
+
+            if (!std::isdigit(current_char.value))
+                return -1;
+
+            source.skipChar();
+            numb = 10 * numb + (current_char.value - '0');
+        }
+
+        if (numb > upper_limit)
+            return -1;
+
+        if (!isZeroAllowed && numb == 0)
+            return -1;
+
+        return numb;
+    }
+
+    int Lexer::getYear() {
+        int numb = 0;
+
+        for (int i = 0; i < 4; ++i) {
+            current_char = source.peekNextChar();
+
+            if (!std::isdigit(current_char.value))
+                return -1;
+
+            source.skipChar();
+            numb = 10 * numb + (current_char.value - '0');
+        }
+
+        return numb < 1900 ? -1 : numb - 1900;
+    }
+
 }

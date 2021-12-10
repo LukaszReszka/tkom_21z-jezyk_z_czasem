@@ -25,7 +25,7 @@ namespace lexer {
         T_DAY_U,            //[d]
         T_DATE,             //[21/03/2021]
         T_TIMESTAMP,        //[21/03/2021 18:54:32]
-        T_CLOCK,            //[18:54:32]
+        T_CLOCK,            //[^18:54:32]
         T_TIME_PERIOD,      //[+2:15:01]
         T_ASSIGN,           // =
         T_PLUS,             // +
@@ -38,15 +38,15 @@ namespace lexer {
         T_NOT_EQUAL,        // =\=
         T_GREATER,          // >
         T_GREATER_E,        // >=
-        T_LESS,           // <
-        T_LESS_E,         // <=
+        T_LESS,             // <
+        T_LESS_E,           // <=
         T_SEMICOLON,
         T_COMMA,
         T_PARENTHESES_1,    // (
         T_PARENTHESES_2,    // )
         T_BRACE_1,          // {
         T_BRACE_2,          // }
-        T_END,              //EOF or ^q
+        T_END,              // EOF
         T_NUMBER_TOO_LARGE,
         T_UNKNOWN
     };
