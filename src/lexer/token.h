@@ -12,6 +12,7 @@ namespace lexer {
     enum token_type {       // all white chars and comments # ... # are skipped
         T_FUNC,             //keywords
         T_IF,
+        T_ELIF,
         T_ELSE,
         T_WHILE,
         T_RET,
@@ -48,7 +49,8 @@ namespace lexer {
         T_BRACE_2,          // }
         T_END,              // EOF
         T_NUMBER_TOO_LARGE,
-        T_UNKNOWN
+        T_UNKNOWN,
+        T_SHOW              // keyword for special function
     };
 
     struct Token {

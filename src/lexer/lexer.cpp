@@ -19,9 +19,11 @@ namespace lexer {
 
         key_words["FUNC"] = T_FUNC;
         key_words["if"] = T_IF;
+        key_words["elif"] = T_ELIF;
         key_words["else"] = T_ELSE;
         key_words["while"] = T_WHILE;
         key_words["RET"] = T_RET;
+        key_words["show"] = T_SHOW;
     }
 
     Token Lexer::getNextToken() {

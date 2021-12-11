@@ -27,7 +27,7 @@ TEST_CASE("getNextChar() method test - code from file") {
         CHECK_EQ(code[i], singleChar.value);
         CHECK_EQ(lin, singleChar.position.line);
         CHECK_EQ(col, singleChar.position.column);
-        CHECK_EQ(false, singleChar.isEndOfText);
+        CHECK_UNARY_FALSE(singleChar.isEndOfText);
         if (code[i] == '\n') {
             col = 1;
             ++lin;
@@ -39,7 +39,7 @@ TEST_CASE("getNextChar() method test - code from file") {
     code_source::CharAndPosition singleChar = source.getNextChar();
     CHECK_EQ(4, singleChar.position.line);
     CHECK_EQ(1, singleChar.position.column);
-    CHECK_EQ(true, singleChar.isEndOfText);
+    CHECK_UNARY(singleChar.isEndOfText);
 
     source_file.close();
     remove(file_name.c_str());
@@ -55,7 +55,7 @@ TEST_CASE("getNextChar() method test - code from string stream") {
         CHECK_EQ(code[i], singleChar.value);
         CHECK_EQ(lin, singleChar.position.line);
         CHECK_EQ(col, singleChar.position.column);
-        CHECK_EQ(false, singleChar.isEndOfText);
+        CHECK_UNARY_FALSE(singleChar.isEndOfText);
         if (code[i] == '\n') {
             col = 1;
             ++lin;
@@ -67,7 +67,7 @@ TEST_CASE("getNextChar() method test - code from string stream") {
     code_source::CharAndPosition singleChar = source.getNextChar();
     CHECK_EQ(4, singleChar.position.line);
     CHECK_EQ(1, singleChar.position.column);
-    CHECK_EQ(true, singleChar.isEndOfText);
+    CHECK_UNARY(singleChar.isEndOfText);
 }
 
 TEST_SUITE_END;
