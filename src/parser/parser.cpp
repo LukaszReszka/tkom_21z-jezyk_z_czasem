@@ -6,6 +6,9 @@
 #include "errorNode.h"
 #include "elifNode.h"
 #include "elseNode.h"
+#include "funcDefNode.h"
+#include "identifierNode.h"
+#include "funcArgsNode.h"
 
 using lexer::Token;
 
@@ -25,17 +28,26 @@ namespace parser {
     }
 
     void Parser::parseFuncDef() {
-        //TODO
+        FuncDefNode *func_def = new FuncDefNode(program);
+        program->children_nodes.push_back(func_def);
+        advance();
+        parseIdentifier(func_def);
+        advance();
+        parseFuncArgs(func_def);
+        advance();
+        parseInstructionsBlock(func_def);
     }
 
     void Parser::parseInstruction(ASTNode *parent) {
 
         if (current_token.type == lexer::T_IDENTIFIER)
-            parseAssignOrFuncCall(parent);
+            parseAssign(parent);
         else if (current_token.type == lexer::T_IF)
             parseIf(parent);
         else if (current_token.type == lexer::T_WHILE)
             parseWhileLoop(parent);
+        else if (current_token.type == lexer::T_DOT)
+            parseFuncCall(parent);
         else if (current_token.type == lexer::T_RET)
             parseRet(parent);
         else if (current_token.type == lexer::T_SHOW)
@@ -58,13 +70,6 @@ namespace parser {
         if (current_token.type != lexer::T_PARENTHESES_2) {
             ret->children_nodes.clear();
             ret->children_nodes.push_back(new ErrorNode(ret));
-            return;
-        }
-        advance();
-        if (current_token.type != lexer::T_SEMICOLON) {
-            ret->children_nodes.clear();
-            ret->children_nodes.push_back(new ErrorNode(ret));
-            return;
         }
     }
 
@@ -95,7 +100,7 @@ namespace parser {
         parseInstructionsBlock(while_loop);
     }
 
-    void Parser::parseAssignOrFuncCall(ASTNode *parent) {
+    void Parser::parseAssign(ASTNode *parent) {
         //TODO
     }
 
@@ -145,5 +150,44 @@ namespace parser {
         parent->children_nodes.push_back(else_statement);
         advance();
         parseInstructionsBlock(else_statement);
+    }
+
+    void Parser::parseIdentifier(ASTNode *parent) {
+        if (current_token.type == lexer::T_IDENTIFIER) {
+            IdentifierNode *id = new IdentifierNode(parent);
+            id->identifier = std::get<std::string>(current_token.value);
+            parent->children_nodes.push_back(id);
+        } else
+            parent->children_nodes.push_back(new ErrorNode(parent));
+    }
+
+    void Parser::parseFuncArgs(ASTNode *parent) {
+        FuncArgsNode *func_args = new FuncArgsNode(parent);
+        parent->children_nodes.push_back(func_args);
+
+        if (current_token.type != lexer::T_PARENTHESES_1) {
+            func_args->children_nodes.push_back(new ErrorNode(func_args));
+            return;
+        }
+        advance();
+
+        if (current_token.type == lexer::T_IDENTIFIER) {
+            parseIdentifier(func_args);
+            advance();
+            while (current_token.type == lexer::T_COMMA) {
+                advance();
+                parseIdentifier(func_args);
+                advance();
+            }
+        }
+
+        if (current_token.type != lexer::T_PARENTHESES_2) {
+            func_args->children_nodes.clear();
+            func_args->children_nodes.push_back(new ErrorNode(func_args));
+        }
+    }
+
+    void Parser::parseFuncCall(ASTNode *parent) {
+
     }
 }

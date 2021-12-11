@@ -8,7 +8,7 @@ namespace parser {
 
     class Parser {
     public:
-        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) { parseProgram(); }
+        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) { /*parseProgram();*/ }
 
         void parseProgram();
 
@@ -29,7 +29,7 @@ namespace parser {
 
         void parseWhileLoop(ASTNode *parent);
 
-        void parseAssignOrFuncCall(ASTNode *parent);
+        void parseAssign(ASTNode *parent);
 
         void parseShowFunc(ASTNode *parent);
 
@@ -42,6 +42,12 @@ namespace parser {
         void parseElif(ASTNode *parent);
 
         void parseElse(ASTNode *parent);
+
+        void parseIdentifier(ASTNode *parent);
+
+        void parseFuncArgs(ASTNode *parent);
+
+        void parseFuncCall(ASTNode *parent);
     };
 }
 

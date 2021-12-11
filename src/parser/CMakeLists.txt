@@ -8,6 +8,6 @@ add_library(parser STATIC
         errorNode.h
         parser.h
         parser.cpp
-        whileLoopNode.h blockNode.h ifNode.h elifNode.h elseNode.h)
+        whileLoopNode.h blockNode.h ifNode.h elifNode.h elseNode.h funcDefNode.h identifierNode.h funcArgsNode.h)
 
 target_include_directories(parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

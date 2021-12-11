@@ -50,7 +50,8 @@ namespace lexer {
         T_END,              // EOF
         T_NUMBER_TOO_LARGE,
         T_UNKNOWN,
-        T_SHOW              // keyword for special function
+        T_SHOW,              // keyword for special function
+        T_DOT
     };
 
     struct Token {

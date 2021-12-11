@@ -58,6 +58,7 @@ int main() {
     token_names[38] = "T_NUMBER_TO_LARGE";
     token_names[39] = "T_UNKNOWN";
     token_names[40] = "T_SHOW";
+    token_names[41] = "T_DOT";
 
     std::cout << "\nRozpoznane tokeny:\n";
 

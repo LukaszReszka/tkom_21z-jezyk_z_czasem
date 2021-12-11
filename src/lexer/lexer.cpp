@@ -16,6 +16,7 @@ namespace lexer {
         single_char_token['}'] = T_BRACE_2;
         single_char_token[','] = T_COMMA;
         single_char_token[';'] = T_SEMICOLON;
+        single_char_token['.'] = T_DOT;
 
         key_words["FUNC"] = T_FUNC;
         key_words["if"] = T_IF;
@@ -23,7 +24,7 @@ namespace lexer {
         key_words["else"] = T_ELSE;
         key_words["while"] = T_WHILE;
         key_words["RET"] = T_RET;
-        key_words["show"] = T_SHOW;
+        key_words["SHOW"] = T_SHOW;
     }
 
     Token Lexer::getNextToken() {
