@@ -9,8 +9,10 @@
 #include "funcDefNode.h"
 #include "identifierNode.h"
 #include "funcArgsNode.h"
-
-using lexer::Token;
+#include "funcCallNode.h"
+#include "assignOperatorNode.h"
+#include "showFuncNode.h"
+#include "stringNode.h"
 
 namespace parser {
 
@@ -41,7 +43,7 @@ namespace parser {
     void Parser::parseInstruction(ASTNode *parent) {
 
         if (current_token.type == lexer::T_IDENTIFIER)
-            parseAssign(parent);
+            parseAssignOperator(parent);
         else if (current_token.type == lexer::T_IF)
             parseIf(parent);
         else if (current_token.type == lexer::T_WHILE)
@@ -100,20 +102,52 @@ namespace parser {
         parseInstructionsBlock(while_loop);
     }
 
-    void Parser::parseAssign(ASTNode *parent) {
-        //TODO
+    void Parser::parseAssignOperator(ASTNode *parent) {
+        AssignOperatorNode *assign_operation = new AssignOperatorNode(parent);
+        parent->children_nodes.push_back(assign_operation);
+        parseIdentifier(assign_operation);
+        advance();
+        if (current_token.type != lexer::T_ASSIGN) {
+            assign_operation->children_nodes.clear();
+            assign_operation->children_nodes.push_back(new ErrorNode(assign_operation));
+            return;
+        }
+        advance();
+        if (current_token.type == lexer::T_DOT)
+            parseFuncCall(assign_operation);
+        else
+            parseArithmeticExpr(assign_operation);
     }
 
     void Parser::parseShowFunc(ASTNode *parent) {
-        //TODO
-    }
+        ShowFuncNode *show_func = new ShowFuncNode(parent);
+        parent->children_nodes.push_back(show_func);
+        advance();
 
-    void Parser::parseArithmeticExpr(ASTNode *parent) {
-        //TODO
-    }
+        if (current_token.type != lexer::T_PARENTHESES_1) {
+            show_func->children_nodes.push_back(new ErrorNode(show_func));
+            return;
+        }
+        advance();
+        if (current_token.type == lexer::T_STRING)
+            parseString(show_func);
+        else
+            parseArithmeticExpr(show_func);
+        advance();
 
-    void Parser::parseCondition(ASTNode *parent) {
-        //TODO
+        while (current_token.type == lexer::T_COMMA) {
+            advance();
+            if (current_token.type == lexer::T_STRING)
+                parseString(show_func);
+            else
+                parseArithmeticExpr(show_func);
+            advance();
+        }
+
+        if (current_token.type != lexer::T_PARENTHESES_2) {
+            show_func->children_nodes.clear();
+            show_func->children_nodes.push_back(new ErrorNode(show_func));
+        }
     }
 
     void Parser::parseInstructionsBlock(ASTNode *parent) {
@@ -188,6 +222,25 @@ namespace parser {
     }
 
     void Parser::parseFuncCall(ASTNode *parent) {
+        FuncCallNode *func_call = new FuncCallNode(parent);
+        parent->children_nodes.push_back(func_call);
+        advance();
+        parseIdentifier(func_call);
+        advance();
+        parseFuncArgs(func_call);
+    }
 
+    void Parser::parseString(ASTNode *parent) {
+        StringNode *string_node = new StringNode(parent);
+        parent->children_nodes.push_back(string_node);
+        string_node->str = std::get<std::string>(current_token.value);
+    }
+    
+    void Parser::parseCondition(ASTNode *parent) {
+        //TODO
+    }
+
+    void Parser::parseArithmeticExpr(ASTNode *parent) {
+        //TODO
     }
 }

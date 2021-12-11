@@ -17,7 +17,9 @@ namespace parser {
         lexer::Token current_token;
         ProgramNode *program;
 
-        inline void advance() { current_token = token_source.getNextToken(); }
+        inline void advance() { current_token = current_token.type == lexer::T_END ? current_token
+                                                                                   : token_source.getNextToken();
+        }
 
         void parseFuncDef();
 
@@ -29,7 +31,7 @@ namespace parser {
 
         void parseWhileLoop(ASTNode *parent);
 
-        void parseAssign(ASTNode *parent);
+        void parseAssignOperator(ASTNode *parent);
 
         void parseShowFunc(ASTNode *parent);
 
@@ -48,6 +50,8 @@ namespace parser {
         void parseFuncArgs(ASTNode *parent);
 
         void parseFuncCall(ASTNode *parent);
+
+        void parseString(ASTNode *parent);
     };
 }
 
