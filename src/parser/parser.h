@@ -8,7 +8,7 @@ namespace parser {
 
     class Parser {
     public:
-        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) { /*parseProgram();*/ }
+        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) { parseProgram(); }
 
         void parseProgram();
 
@@ -17,8 +17,9 @@ namespace parser {
         lexer::Token current_token;
         ProgramNode *program;
 
-        inline void advance() { current_token = current_token.type == lexer::T_END ? current_token
-                                                                                   : token_source.getNextToken();
+        inline void advance() {
+            current_token = current_token.type == lexer::T_END ? current_token
+                                                               : token_source.getNextToken();
         }
 
         void parseFuncDef();
@@ -52,6 +53,22 @@ namespace parser {
         void parseFuncCall(ASTNode *parent);
 
         void parseString(ASTNode *parent);
+
+        void parseLogicalExpr(ASTNode *parent);
+
+        void parseComparisonExpr(ASTNode *parent);
+
+        void parseMultiplicativeExpr(ASTNode *parent);
+
+        void parseFactor(ASTNode *parent);
+
+        void parseValue(ASTNode *parent);
+
+        void parseNumericAndTimeValue(ASTNode *parent);
+
+        void parseTimeUnit(ASTNode *parent);
+
+        void parseNumbers(ASTNode *parent);
     };
 }
 

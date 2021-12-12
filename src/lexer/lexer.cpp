@@ -15,7 +15,6 @@ namespace lexer {
         single_char_token['{'] = T_BRACE_1;
         single_char_token['}'] = T_BRACE_2;
         single_char_token[','] = T_COMMA;
-        single_char_token[';'] = T_SEMICOLON;
         single_char_token['.'] = T_DOT;
 
         key_words["FUNC"] = T_FUNC;
@@ -203,10 +202,6 @@ namespace lexer {
 
                 case 'h':
                     token->type = T_HOUR_U;
-                    break;
-
-                case 'd':
-                    token->type = T_DAY_U;
                     break;
 
                 default: {

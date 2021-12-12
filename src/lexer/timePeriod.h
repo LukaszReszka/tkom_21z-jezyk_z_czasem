@@ -6,9 +6,9 @@
 namespace lexer {
 
     struct TimePeriod {
-        std::chrono::seconds s;
-        std::chrono::minutes m;
-        std::chrono::hours h;
+        std::chrono::seconds s = std::chrono::seconds(0);
+        std::chrono::minutes m = std::chrono::minutes(0);
+        std::chrono::hours h = std::chrono::hours(0);
     };
 }
 

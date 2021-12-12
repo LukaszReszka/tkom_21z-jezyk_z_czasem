@@ -13,6 +13,15 @@
 #include "assignOperatorNode.h"
 #include "showFuncNode.h"
 #include "stringNode.h"
+#include "conditionNode.h"
+#include "binaryOperatorsNode.h"
+#include "unaryOperatorNode.h"
+#include "timePeriodNode.h"
+#include "dateNode.h"
+#include "timestampNode.h"
+#include "clockNode.h"
+#include "intNode.h"
+#include "doubleNode.h"
 
 namespace parser {
 
@@ -235,12 +244,179 @@ namespace parser {
         parent->children_nodes.push_back(string_node);
         string_node->str = std::get<std::string>(current_token.value);
     }
-    
+
     void Parser::parseCondition(ASTNode *parent) {
-        //TODO
+        ConditionNode *condition = new ConditionNode(parent);
+        parent->children_nodes.push_back(condition);
+
+        if (current_token.type != lexer::T_PARENTHESES_1) {
+            condition->children_nodes.push_back(new ErrorNode(condition));
+            return;
+        }
+
+        advance();
+        parseLogicalExpr(condition);
+        advance();
+
+        if (current_token.type != lexer::T_PARENTHESES_2) {
+            condition->children_nodes.clear();
+            condition->children_nodes.push_back(new ErrorNode(condition));
+        }
+    }
+
+    void Parser::parseLogicalExpr(ASTNode *parent) {
+        BinaryOperatorsNode *binary_operation = new BinaryOperatorsNode(parent);
+        parent->children_nodes.push_back(binary_operation);
+        parseComparisonExpr(binary_operation);
+        advance();
+        if (current_token.type == lexer::T_OR || current_token.type == lexer::T_AND) {
+            if (current_token.type == lexer::T_OR)
+                binary_operation->operator_type = OR;
+            else if (current_token.type == lexer::T_AND)
+                binary_operation->operator_type = AND;
+            advance();
+            parseLogicalExpr(binary_operation);
+        }
+
+    }
+
+    void Parser::parseComparisonExpr(ASTNode *parent) {
+        BinaryOperatorsNode *binary_operation = new BinaryOperatorsNode(parent);
+        parent->children_nodes.push_back(binary_operation);
+        parseArithmeticExpr(binary_operation);
+        advance();
+        if (current_token.type == lexer::T_EQUAL)
+            binary_operation->operator_type = EQUAL;
+        else if (current_token.type == lexer::T_NOT_EQUAL)
+            binary_operation->operator_type = NOT_EQUAL;
+        else if (current_token.type == lexer::T_GREATER)
+            binary_operation->operator_type = GREATER;
+        else if (current_token.type == lexer::T_GREATER_E)
+            binary_operation->operator_type = GREATER_EQUAL;
+        else if (current_token.type == lexer::T_LESS)
+            binary_operation->operator_type = LESS;
+        else if (current_token.type == lexer::T_LESS_E)
+            binary_operation->operator_type = LESS_EQUAL;
+        else {
+            binary_operation->children_nodes.clear();
+            binary_operation->children_nodes.push_back(new ErrorNode(binary_operation));
+            return;
+        }
+        advance();
+        parseArithmeticExpr(binary_operation);
     }
 
     void Parser::parseArithmeticExpr(ASTNode *parent) {
-        //TODO
+        BinaryOperatorsNode *binary_operation = new BinaryOperatorsNode(parent);
+        parent->children_nodes.push_back(binary_operation);
+        parseMultiplicativeExpr(binary_operation);
+        advance();
+        if (current_token.type == lexer::T_PLUS || current_token.type == lexer::T_MINUS) {
+            if (current_token.type == lexer::T_PLUS)
+                binary_operation->operator_type = PLUS;
+            else if (current_token.type == lexer::T_MINUS)
+                binary_operation->operator_type = MINUS;
+            advance();
+            parseArithmeticExpr(binary_operation);
+        }
+    }
+
+    void Parser::parseMultiplicativeExpr(ASTNode *parent) {
+        BinaryOperatorsNode *binary_operation = new BinaryOperatorsNode(parent);
+        parent->children_nodes.push_back(binary_operation);
+        parseFactor(binary_operation);
+        advance();
+        if (current_token.type == lexer::T_MULTIPLY || current_token.type == lexer::T_DIVIDE) {
+            if (current_token.type == lexer::T_MULTIPLY)
+                binary_operation->operator_type = MULTIPLY;
+            else if (current_token.type == lexer::T_DIVIDE)
+                binary_operation->operator_type = DIVIDE;
+            advance();
+            parseMultiplicativeExpr(binary_operation);
+        }
+    }
+
+    void Parser::parseFactor(ASTNode *parent) {
+        if (current_token.type == lexer::T_MINUS) {
+            UnaryOperatorNode *unary_minus = new UnaryOperatorNode(parent);
+            parent->children_nodes.push_back(unary_minus);
+            advance();
+            parseValue(unary_minus);
+        } else
+            parseValue(parent);
+    }
+
+    void Parser::parseValue(ASTNode *parent) {
+        if (current_token.type == lexer::T_IDENTIFIER)
+            parseIdentifier(parent);
+        else if (current_token.type == lexer::T_DOT)
+            parseFuncCall(parent);
+        else if (current_token.type == lexer::T_PARENTHESES_1) {
+            advance();
+            parseArithmeticExpr(parent);
+            advance();
+            if (current_token.type != lexer::T_PARENTHESES_2) {
+                parent->children_nodes.clear();
+                parent->children_nodes.push_back(new ErrorNode(parent));
+                return;
+            }
+        } else
+            parseNumericAndTimeValue(parent);
+    }
+
+    void Parser::parseNumericAndTimeValue(ASTNode *parent) {
+        if (current_token.type == lexer::T_DATE) {
+            DateNode *date = new DateNode(parent);
+            date->moment = std::get<lexer::TimeMoment>(current_token.value);
+            parent->children_nodes.push_back(date);
+        } else if (current_token.type == lexer::T_TIMESTAMP) {
+            TimestampNode *timestamp = new TimestampNode(parent);
+            timestamp->moment = std::get<lexer::TimeMoment>(current_token.value);
+            parent->children_nodes.push_back(timestamp);
+        } else if (current_token.type == lexer::T_CLOCK) {
+            ClockNode *clock = new ClockNode(parent);
+            clock->moment = std::get<lexer::TimeMoment>(current_token.value);
+            parent->children_nodes.push_back(clock);
+        } else if (current_token.type == lexer::T_TIME_PERIOD) {
+            TimePeriodNode *time_period = new TimePeriodNode(parent);
+            time_period->period = std::get<lexer::TimePeriod>(current_token.value);
+            parent->children_nodes.push_back(time_period);
+        } else if (current_token.type == lexer::T_INT || current_token.type == lexer::T_DOUBLE) {
+            parseNumbers(parent);
+        } else if (current_token.type == lexer::T_HOUR_U || current_token.type == lexer::T_MIN_U ||
+                   current_token.type == lexer::T_SEC_U) {
+            parseTimeUnit(parent);
+        } else
+            parent->children_nodes.push_back(new ErrorNode(parent));
+    }
+
+    void Parser::parseNumbers(ASTNode *parent) {
+        if (current_token.type == lexer::T_INT) {
+            IntNode *number = new IntNode(parent);
+            number->value = std::get<int>(current_token.value);
+            parent->children_nodes.push_back(number);
+        } else if (current_token.type == lexer::T_DOUBLE) {
+            DoubleNode *number = new DoubleNode(parent);
+            number->value = std::get<double>(current_token.value);
+            parent->children_nodes.push_back(number);
+        } else
+            parent->children_nodes.push_back(new ErrorNode(parent));
+    }
+
+
+    void Parser::parseTimeUnit(ASTNode *parent) {
+        UnaryOperatorNode *time_operator = new UnaryOperatorNode(parent);
+        parent->children_nodes.push_back(time_operator);
+
+        if (current_token.type == lexer::T_HOUR_U) {
+            time_operator->operator_type = HOUR;
+        } else if (current_token.type == lexer::T_MIN_U) {
+            time_operator->operator_type = MIN;
+        } else if (current_token.type == lexer::T_SEC_U) {
+            time_operator->operator_type = SEC;
+        }
+
+        advance();
+        parseNumbers(time_operator);
     }
 }

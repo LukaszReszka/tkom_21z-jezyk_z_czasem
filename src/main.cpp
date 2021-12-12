@@ -30,7 +30,7 @@ int main() {
     token_names[10] = "T_SEC_U";
     token_names[11] = "T_MIN_U";
     token_names[12] = "T_HOUR_U";
-    token_names[13] = "T_DAY_U";
+    token_names[13] = "T_SHOW";
     token_names[14] = "T_DATE";
     token_names[15] = "T_TIMESTAMP";
     token_names[16] = "T_CLOCK";
@@ -48,7 +48,7 @@ int main() {
     token_names[28] = "T_GREATER_E";
     token_names[29] = "T_LESS";
     token_names[30] = "T_LESS_E";
-    token_names[31] = "T_SEMICOLON";
+    token_names[31] = "T_DOT";
     token_names[32] = "T_COMMA";
     token_names[33] = "T_PARENTHESES_1";
     token_names[34] = "T_PARENTHESES_2";
@@ -57,8 +57,6 @@ int main() {
     token_names[37] = "T_END";
     token_names[38] = "T_NUMBER_TO_LARGE";
     token_names[39] = "T_UNKNOWN";
-    token_names[40] = "T_SHOW";
-    token_names[41] = "T_DOT";
 
     std::cout << "\nRozpoznane tokeny:\n";
 

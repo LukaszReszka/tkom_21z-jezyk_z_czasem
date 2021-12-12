@@ -6,6 +6,15 @@
 namespace lexer {
 
     struct TimeMoment {
+        TimeMoment() {
+            moment.tm_year = 0;
+            moment.tm_mon = 0;
+            moment.tm_mday = 2;
+            moment.tm_hour = 12;
+            moment.tm_min = 0;
+            moment.tm_sec = 0;
+        }
+
         std::tm moment;
 
         int getYear() const {

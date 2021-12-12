@@ -23,7 +23,7 @@ namespace lexer {
         T_SEC_U,            //[s]
         T_MIN_U,            //[m]
         T_HOUR_U,           //[h]
-        T_DAY_U,            //[d]
+        T_SHOW,             // keyword for special function
         T_DATE,             //[21/03/2021]
         T_TIMESTAMP,        //[21/03/2021 18:54:32]
         T_CLOCK,            //[^18:54:32]
@@ -41,7 +41,7 @@ namespace lexer {
         T_GREATER_E,        // >=
         T_LESS,             // <
         T_LESS_E,           // <=
-        T_SEMICOLON,
+        T_DOT,
         T_COMMA,
         T_PARENTHESES_1,    // (
         T_PARENTHESES_2,    // )
@@ -49,9 +49,7 @@ namespace lexer {
         T_BRACE_2,          // }
         T_END,              // EOF
         T_NUMBER_TOO_LARGE,
-        T_UNKNOWN,
-        T_SHOW,              // keyword for special function
-        T_DOT
+        T_UNKNOWN
     };
 
     struct Token {
