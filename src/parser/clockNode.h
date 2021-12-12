@@ -10,6 +10,15 @@ namespace parser {
         ClockNode(ASTNode *parent) : ASTNode(parent) {}
 
         lexer::TimeMoment moment;
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "";
+            for (int i = 0; i < depth; ++i)
+                res += "-";
+            res += "Time moment - clock: " + std::to_string(moment.getHour()) + ":" + std::to_string(moment.getMin()) +
+                   ":" + std::to_string(moment.getSec()) + "\n";
+            return res;
+        }
     };
 }
 

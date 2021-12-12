@@ -7,6 +7,10 @@ namespace parser {
     class BlockNode : public ASTNode {
     public:
         BlockNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            return getUsualTextRepresentation(depth, "Instructions Block\n");
+        }
     };
 }
 

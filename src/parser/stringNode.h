@@ -10,6 +10,14 @@ namespace parser {
         StringNode(ASTNode *parent) : ASTNode(parent) {}
 
         std::string str;
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "";
+            for (int i = 0; i < depth; ++i)
+                res += "-";
+            res += "STRING: " + str + "\n";
+            return res;
+        }
     };
 }
 

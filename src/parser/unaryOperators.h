@@ -2,7 +2,7 @@
 #define JEZYK_Z_CZASEM_UNARYOPERATORS_H
 
 enum UnaryOperators {
-    NEGATIVE, SEC, MIN, HOUR
+    NEGATION, SEC, MIN, HOUR
 };
 
 

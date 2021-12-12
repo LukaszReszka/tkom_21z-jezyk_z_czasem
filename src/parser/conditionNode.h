@@ -7,6 +7,10 @@ namespace parser {
     class ConditionNode : public ASTNode {
     public:
         ConditionNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            return getUsualTextRepresentation(depth, "Condition\n");
+        }
     };
 }
 

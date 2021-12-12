@@ -7,6 +7,10 @@ namespace parser {
     class FuncCallNode : public ASTNode {
     public:
         FuncCallNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            return getUsualTextRepresentation(depth, "Function Call\n");
+        }
     };
 }
 

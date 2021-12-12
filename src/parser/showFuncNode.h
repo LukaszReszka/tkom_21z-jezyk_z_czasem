@@ -7,6 +7,11 @@ namespace parser {
     class ShowFuncNode : public ASTNode {
     public:
         ShowFuncNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            return getUsualTextRepresentation(depth, "SHOW Function\n");
+        }
+        
     };
 }
 

@@ -7,6 +7,10 @@ namespace parser {
     class IfNode : public ASTNode {
     public:
         IfNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            return getUsualTextRepresentation(depth, "IF statement\n");
+        }
     };
 }
 

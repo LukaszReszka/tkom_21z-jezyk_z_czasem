@@ -7,7 +7,13 @@ namespace parser {
     class ProgramNode : public ASTNode {
     public:
         ProgramNode() : ASTNode(this) {}
-        
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "PROGRAM ROOT\n";
+            for (auto node: children_nodes)
+                res += node->getTextRepresentation(1);
+            return res;
+        }
     };
 }
 

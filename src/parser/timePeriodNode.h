@@ -10,6 +10,16 @@ namespace parser {
         TimePeriodNode(ASTNode *parent) : ASTNode(parent) {}
 
         lexer::TimePeriod period;
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "";
+            for (int i = 0; i < depth; ++i)
+                res += "-";
+            res += "Time period: " + std::to_string(std::chrono::duration<int>(period.h).count()) + " h "
+                   + std::to_string(std::chrono::duration<int>(period.m).count()) + " m " +
+                   std::to_string(std::chrono::duration<int>(period.s).count()) + " s\n";
+            return res;
+        }
     };
 }
 

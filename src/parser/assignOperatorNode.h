@@ -7,6 +7,23 @@ namespace parser {
     class AssignOperatorNode : public ASTNode {
     public:
         AssignOperatorNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "", is_assigned_with = "";
+            for (int i = 0; i < depth; ++i) {
+                res += "-";
+                is_assigned_with += "-";
+            }
+            res += "Assign Operation\n";
+            is_assigned_with += "is assigned with\n";
+
+            for (int j = 0; j < children_nodes.size(); ++j) {
+                if (j == 1)
+                    res += is_assigned_with;
+                res += children_nodes[j]->getTextRepresentation(depth + 1);
+            }
+            return res;
+        }
     };
 }
 

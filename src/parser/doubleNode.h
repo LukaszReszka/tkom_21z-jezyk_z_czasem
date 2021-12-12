@@ -9,6 +9,14 @@ namespace parser {
         DoubleNode(ASTNode *parent) : ASTNode(parent) {}
 
         double value;
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "";
+            for (int i = 0; i < depth; ++i)
+                res += "-";
+            res += "DOUBLE: " + std::to_string(value) + "\n";
+            return res;
+        }
     };
 }
 

@@ -7,6 +7,10 @@ namespace parser {
     class ElifNode : public ASTNode {
     public:
         ElifNode(ASTNode *parent) : ASTNode(parent) {}
+
+        std::string getTextRepresentation(int depth) override {
+            return getUsualTextRepresentation(depth, "ELIF statement\n");
+        }
     };
 }
 

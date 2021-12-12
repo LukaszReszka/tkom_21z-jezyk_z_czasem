@@ -10,6 +10,15 @@ namespace parser {
         DateNode(ASTNode *parent) : ASTNode(parent) {}
 
         lexer::TimeMoment moment;
+
+        std::string getTextRepresentation(int depth) override {
+            std::string res = "";
+            for (int i = 0; i < depth; ++i)
+                res += "-";
+            res += "Time moment - date: " + std::to_string(moment.getDay()) + "/" +
+                   std::to_string(moment.getMonth() + 1) + "/" + std::to_string(moment.getYear() + 1900) + "\n";
+            return res;
+        }
     };
 }
 
