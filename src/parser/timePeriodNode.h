@@ -15,8 +15,8 @@ namespace parser {
             std::string res = "";
             for (int i = 0; i < depth; ++i)
                 res += "-";
-            res += "Time period: " + std::to_string(std::chrono::duration<int>(period.h).count()) + " h "
-                   + std::to_string(std::chrono::duration<int>(period.m).count()) + " m " +
+            res += "Time period: " + std::to_string(std::chrono::duration<int>(period.h).count() / 3600) + " h "
+                   + std::to_string(std::chrono::duration<int>(period.m).count() / 60) + " m " +
                    std::to_string(std::chrono::duration<int>(period.s).count()) + " s\n";
             return res;
         }

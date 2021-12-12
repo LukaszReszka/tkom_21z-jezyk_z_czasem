@@ -15,7 +15,7 @@ namespace parser {
                 is_assigned_with += "-";
             }
             res += "Assign Operation\n";
-            is_assigned_with += "is assigned with\n";
+            is_assigned_with += "is assigned to\n";
 
             for (int j = 0; j < children_nodes.size(); ++j) {
                 if (j == 1)

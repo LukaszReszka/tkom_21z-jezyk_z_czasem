@@ -35,7 +35,7 @@ TEST_CASE("Brackets recognition") {
     //TODO
 }
 
-TEST_CASE("Commas and semicolons recognition") {
+TEST_CASE("Commas and dots recognition") {
     //TODO
 }
 
