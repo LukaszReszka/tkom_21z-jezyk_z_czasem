@@ -48,7 +48,7 @@ namespace lexer {
             return token;
 
         token.type = T_UNKNOWN;
-        token.value = "" + current_char.value;
+        token.value = "" + std::to_string(current_char.value);
         return token;
     }
 
@@ -206,19 +206,19 @@ namespace lexer {
 
                 default: {
                     token->type = T_UNKNOWN;
-                    std::string res = "[" + unit_char;
+                    std::string res = "[" + std::to_string(unit_char);
                     token->value = res + "]";
                 }
             }
             source.skipChar();
         } else {
             token->type = T_UNKNOWN;
-            token->value = "[" + unit_char;
+            token->value = "[" + std::to_string(unit_char);
         }
     }
 
     void Lexer::stringToken(Token *token) {
-        std::string res = "";
+        std::string res;
         current_char = source.peekNextChar();
         char c = current_char.value;
         while (isalnum(c) || c == ' ' || c == '\t' || c == '\\') {
@@ -268,7 +268,7 @@ namespace lexer {
     }
 
     void Lexer::identifierToken(Token *token) {
-        std::string res = "";
+        std::string res;
         res += current_char.value;
         current_char = source.peekNextChar();
         while (isalnum(current_char.value) || current_char.value == '_') {

@@ -10,7 +10,7 @@
 int main() {
     code_source::CodeSource source(std::cin);
     lexer::Lexer lexer(source);
-    parser::ProgramNode *program = new parser::ProgramNode();
+    auto *program = new parser::ProgramNode();
     parser::Parser parser(lexer, program);
     std::cout << program->getTextRepresentation(0);
     return 0;

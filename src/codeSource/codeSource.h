@@ -9,7 +9,7 @@ namespace code_source {
     class CodeSource {
 
     public:
-        CodeSource(std::istream &input) : source(input) {}
+        explicit CodeSource(std::istream &input) : source(input) {}
 
         CharAndPosition getNextChar();
 

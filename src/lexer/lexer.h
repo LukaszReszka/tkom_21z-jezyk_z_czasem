@@ -10,7 +10,7 @@ namespace lexer {
     class Lexer {
 
     public:
-        Lexer(code_source::CodeSource s);
+        explicit Lexer(code_source::CodeSource s);
 
         Token getNextToken();
 

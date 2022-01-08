@@ -15,29 +15,29 @@ namespace lexer {
             moment.tm_sec = 0;
         }
 
-        std::tm moment;
+        std::tm moment{};
 
-        int getYear() const {
+        [[nodiscard]] int getYear() const {
             return moment.tm_year;
         }
 
-        int getMonth() const {
+        [[nodiscard]] int getMonth() const {
             return moment.tm_mon;
         }
 
-        int getDay() const {
+        [[nodiscard]] int getDay() const {
             return moment.tm_mday;
         }
 
-        int getHour() const {
+        [[nodiscard]] int getHour() const {
             return moment.tm_hour;
         }
 
-        int getMin() const {
+        [[nodiscard]] int getMin() const {
             return moment.tm_min;
         }
 
-        int getSec() const {
+        [[nodiscard]] int getSec() const {
             return moment.tm_sec;
         }
 

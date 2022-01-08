@@ -21,7 +21,7 @@ namespace code_source {
     }
 
     CharAndPosition CodeSource::peekNextChar() {
-        char c = source.peek();
+        char c = (char) source.peek();
 
         if (source.eof()) {
             CharAndPosition eofChar(line + 1, column + 1);

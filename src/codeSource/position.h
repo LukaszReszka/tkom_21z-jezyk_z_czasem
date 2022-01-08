@@ -9,7 +9,7 @@ namespace code_source {
         uint column;
         uint line;
 
-        Position() {}
+        Position() = default;
 
         Position(uint lin, uint col) : column(col), line(lin) {}
     };

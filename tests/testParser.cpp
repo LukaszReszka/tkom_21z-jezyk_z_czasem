@@ -79,7 +79,7 @@ TEST_CASE("SHOW Function") {
     }
 
     SUBCASE("With string arguments - with escaping \"") {
-        code = "SHOW(\"He said \\\"no\\\"\", \"She replied \\\"yes\\\"\")";
+        code = R"(SHOW("He said \"no\"", "She replied \"yes\""))";
         right_tree = "PROGRAM ROOT\n"
                      "-SHOW Function\n"
                      "--STRING: He said \"no\"\n"

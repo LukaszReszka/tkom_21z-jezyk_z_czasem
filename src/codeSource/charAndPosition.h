@@ -8,11 +8,11 @@ namespace code_source {
     typedef unsigned int uint;
 
     struct CharAndPosition {
-        char value;
-        bool isEndOfText;
-        Position position;
+        char value{};
+        bool isEndOfText{};
+        Position position{};
 
-        CharAndPosition() {}
+        CharAndPosition() = default;
 
         CharAndPosition(char c, uint lin, uint col) : value(c), isEndOfText(false),
                                                       position(lin, col) {}
