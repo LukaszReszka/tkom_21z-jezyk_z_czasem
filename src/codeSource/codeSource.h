@@ -15,7 +15,7 @@ namespace code_source {
 
         CharAndPosition peekNextChar();
 
-        inline void skipChar() { source.get(); }
+        void skipChar();
 
     private:
         uint line = 0;

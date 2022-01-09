@@ -18,11 +18,11 @@ namespace lexer {
         std::tm moment{};
 
         [[nodiscard]] int getYear() const {
-            return moment.tm_year;
+            return moment.tm_year + 1900;
         }
 
         [[nodiscard]] int getMonth() const {
-            return moment.tm_mon;
+            return moment.tm_mon + 1;
         }
 
         [[nodiscard]] int getDay() const {
@@ -42,11 +42,11 @@ namespace lexer {
         }
 
         void setYear(int year_since_1900) {
-            moment.tm_year = year_since_1900;
+            moment.tm_year = year_since_1900 - 1900;
         }
 
         void setMonth(int month) {
-            moment.tm_mon = month;
+            moment.tm_mon = month - 1;
         }
 
         void setDay(int day) {

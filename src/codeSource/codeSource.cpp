@@ -31,4 +31,12 @@ namespace code_source {
             return readChar;
         }
     }
+
+    void CodeSource::skipChar() {
+        ++column;
+        if (((char) source.get()) == '\n') {
+            ++line;
+            column = 0;
+        }
+    }
 }

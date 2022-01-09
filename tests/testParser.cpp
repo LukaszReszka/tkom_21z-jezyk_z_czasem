@@ -2,7 +2,7 @@
 #include "../src/parser/parser.h"
 #include <sstream>
 
-TEST_SUITE_BEGIN("Parser tests - building AST tree");
+TEST_SUITE_BEGIN("Parser tests - building program tree");
 
 std::string getTree(const std::string &code) {
     std::stringstream code_to_test(code);

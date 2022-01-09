@@ -48,7 +48,9 @@ namespace lexer {
             return token;
 
         token.type = T_UNKNOWN;
-        token.value = "" + std::to_string(current_char.value);
+        std::string unknown_str;
+        unknown_str += current_char.value;
+        token.value = unknown_str;
         return token;
     }
 
@@ -189,6 +191,7 @@ namespace lexer {
 
     void Lexer::unitToken(Token *token) {
         char unit_char = current_char.value;
+        std::string unknown_str = "[";
         current_char = source.peekNextChar();
         if (current_char.value == ']') {
             switch (unit_char) {
@@ -206,14 +209,15 @@ namespace lexer {
 
                 default: {
                     token->type = T_UNKNOWN;
-                    std::string res = "[" + std::to_string(unit_char);
-                    token->value = res + "]";
+                    unknown_str += unit_char;
+                    token->value = unknown_str + "]";
                 }
             }
             source.skipChar();
         } else {
             token->type = T_UNKNOWN;
-            token->value = "[" + std::to_string(unit_char);
+            unknown_str += unit_char;
+            token->value = unknown_str;
         }
     }
 
@@ -244,6 +248,8 @@ namespace lexer {
             source.skipChar();
         } else {
             token->type = T_UNKNOWN;
+            if (res.empty())
+                res += "\"";
             token->value = res;
         }
     }
@@ -381,7 +387,6 @@ namespace lexer {
         current_char = source.peekNextChar();
         if (month == -1 || current_char.value != '/')
             return false;
-        --month;
         source.skipChar();
         int year = getYear();
         if (year == -1)
@@ -461,14 +466,14 @@ namespace lexer {
         for (int i = 0; i < 4; ++i) {
             current_char = source.peekNextChar();
 
-            if (!std::isdigit(current_char.value))
+            if (!std::isdigit((char) current_char.value))
                 return -1;
 
             source.skipChar();
             numb = 10 * numb + (current_char.value - '0');
         }
 
-        return numb < 1900 ? -1 : numb - 1900;
+        return numb < 1900 ? -1 : numb;
     }
 
 }

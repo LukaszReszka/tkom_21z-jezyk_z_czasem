@@ -16,7 +16,7 @@ namespace parser {
             for (int i = 0; i < depth; ++i)
                 res += "-";
             res += "Time moment - timestamp: " + std::to_string(moment.getDay()) + "/" +
-                   std::to_string(moment.getMonth() + 1) + "/" + std::to_string(moment.getYear() + 1900) + " " +
+                   std::to_string(moment.getMonth()) + "/" + std::to_string(moment.getYear()) + " " +
                    std::to_string(moment.getHour()) + ":" + std::to_string(moment.getMin()) +
                    ":" + std::to_string(moment.getSec()) + "\n";
             return res;
