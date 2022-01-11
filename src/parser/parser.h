@@ -3,24 +3,31 @@
 
 #include "../lexer/lexer.h"
 #include "programNode.h"
+#include "programtree.h"
+#include "command.h"
+#include <memory>
+
+using std::unique_ptr;
 
 namespace parser {
 
     class Parser {
     public:
-        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) { parseProgram(); }
+        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) {}  //TODO delete program(root)
 
-        void parseProgram();
+        unique_ptr<ProgramTree> parseProgram();
 
     private:
         lexer::Lexer token_source;
         lexer::Token current_token;
-        ProgramNode *program;
+        ProgramNode *program;  //TODO delete
 
         inline void advance() {
             current_token = current_token.type == lexer::T_END ? current_token
                                                                : token_source.getNextToken();
         }
+
+        unique_ptr<Command> parseCommand();
 
         void parseFuncDef();
 

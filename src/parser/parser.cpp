@@ -25,17 +25,23 @@
 
 namespace parser {
 
-    void Parser::parseProgram() {
+    unique_ptr<ProgramTree> Parser::parseProgram() {
         advance();
-
+        unique_ptr<ProgramTree> programTree(new ProgramTree());
         while (current_token.type != lexer::T_END) {
-            if (current_token.type == lexer::T_FUNC)
-                parseFuncDef();
-            else
-                parseInstruction(program);
-
+            programTree->addCommand(parseCommand());
             advance();
         }
+        return programTree;
+    }
+
+    unique_ptr<Command> Parser::parseCommand() {
+        if (current_token.type == lexer::T_FUNC)
+            parseFuncDef();
+        else
+            parseInstruction(program);
+
+        return unique_ptr<Command>();
     }
 
     void Parser::parseFuncDef() {

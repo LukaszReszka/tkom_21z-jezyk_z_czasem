@@ -31,6 +31,6 @@ add_library(parser STATIC
         intNode.h
         doubleNode.h
         unaryOperators.h
-        )
+        phrase.h expression.h programtree.cpp programtree.h command.cpp command.h)
 
 target_include_directories(parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

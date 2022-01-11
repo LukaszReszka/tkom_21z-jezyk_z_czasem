@@ -2,6 +2,7 @@
 #define JEZYK_Z_CZASEM_ASSIGNOPERATORNODE_H
 
 #include "astNode.h"
+#include "phrase.h"
 
 namespace parser {
     class AssignOperatorNode : public ASTNode {

@@ -3,6 +3,7 @@
  * */
 
 #include <iostream>
+#include <memory>
 #include "codeSource/codeSource.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
@@ -12,6 +13,7 @@ int main() {
     lexer::Lexer lexer(source);
     auto *program = new parser::ProgramNode();
     parser::Parser parser(lexer, program);
-    std::cout << program->getTextRepresentation(0);
+    std::unique_ptr<parser::ProgramTree> programTree = std::move(parser.parseProgram());
+    std::cout << programTree->toString();
     return 0;
 }

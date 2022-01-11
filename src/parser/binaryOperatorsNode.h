@@ -3,6 +3,7 @@
 
 #include "astNode.h"
 #include "binaryOperators.h"
+#include "expression.h"
 
 namespace parser {
     class BinaryOperatorsNode : public ASTNode {
