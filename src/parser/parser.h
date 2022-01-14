@@ -5,22 +5,28 @@
 #include "programNode.h"
 #include "programtree.h"
 #include "command.h"
+#include "returninstr.h"
+#include "showfunc.h"
+#include "whileloop.h"
+#include "ifstatement.h"
+#include "operatoroperation.h"
 #include <memory>
 
 using std::unique_ptr;
+using std::string;
+using std::vector;
 
 namespace parser {
 
     class Parser {
     public:
-        Parser(lexer::Lexer &lex, ProgramNode *root) : token_source(lex), program(root) {}  //TODO delete program(root)
+        explicit Parser(lexer::Lexer &lex) : token_source(lex) {}
 
         unique_ptr<ProgramTree> parseProgram();
 
     private:
         lexer::Lexer token_source;
         lexer::Token current_token;
-        ProgramNode *program;  //TODO delete
 
         inline void advance() {
             current_token = current_token.type == lexer::T_END ? current_token
@@ -29,49 +35,47 @@ namespace parser {
 
         unique_ptr<Command> parseCommand();
 
-        void parseFuncDef();
+        unique_ptr<FuncDef> parseFuncDef();
 
-        void parseInstruction(ASTNode *parent);
+        unique_ptr<Instruction> parseInstruction();
 
-        void parseRet(ASTNode *parent);
+        unique_ptr<ReturnInstr> parseRet();
 
-        void parseIf(ASTNode *parent);
+        unique_ptr<IfStatement> parseIf();
 
-        void parseWhileLoop(ASTNode *parent);
+        unique_ptr<WhileLoop> parseWhileLoop();
 
-        void parseAssignOperator(ASTNode *parent);
+        unique_ptr<OperatorOperation> parseAssignOperator();
 
-        void parseShowFunc(ASTNode *parent);
+        unique_ptr<ShowFunc> parseShowFunc();
 
-        void parseArithmeticExpr(ASTNode *parent);
+        unique_ptr<Expression> parseArithmeticExpr();
 
-        void parseCondition(ASTNode *parent);
+        unique_ptr<Expression> parseCondition();
 
-        void parseInstructionsBlock(ASTNode *parent);
+        void parseInstructionsBlock(vector<unique_ptr<Phrase>> &instructs);
 
-        void parseElif(ASTNode *parent);
+        unique_ptr<ElifStat> parseElif();
 
-        void parseElse(ASTNode *parent);
+        unique_ptr<ElifStat> parseElse();
 
-        void parseIdentifier(ASTNode *parent);
+        void parseIdentifier(string &ident);
 
-        void parseFuncArgs(ASTNode *parent);
+        void parseFuncArgs(vector<string> &args);
 
-        void parseFuncCall(ASTNode *parent);
+        unique_ptr<FuncCall> parseFuncCall();
 
-        void parseString(ASTNode *parent);
+        unique_ptr<Expression> parseLogicalExpr();
 
-        void parseLogicalExpr(ASTNode *parent);
+        unique_ptr<Expression> parseComparisonExpr();
 
-        void parseComparisonExpr(ASTNode *parent);
+        unique_ptr<Expression> parseMultiplicativeExpr();
 
-        void parseMultiplicativeExpr(ASTNode *parent);
+        unique_ptr<Expression> parseFactor();
 
-        void parseFactor(ASTNode *parent);
+        unique_ptr<Expression> parseValue();
 
-        void parseValue(ASTNode *parent);
-
-        void parseNumericAndTimeValue(ASTNode *parent);
+        unique_ptr<Expression> parseNumericAndTimeValue();
 
         void parseTimeUnit(ASTNode *parent);
 

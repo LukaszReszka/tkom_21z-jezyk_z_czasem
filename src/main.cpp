@@ -11,8 +11,7 @@
 int main() {
     code_source::CodeSource source(std::cin);
     lexer::Lexer lexer(source);
-    auto *program = new parser::ProgramNode();
-    parser::Parser parser(lexer, program);
+    parser::Parser parser(lexer);
     std::unique_ptr<parser::ProgramTree> programTree = std::move(parser.parseProgram());
     std::cout << programTree->toString();
     return 0;

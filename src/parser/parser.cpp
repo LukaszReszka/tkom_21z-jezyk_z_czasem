@@ -1,4 +1,6 @@
 #include "parser.h"
+
+#include <memory>
 #include "returnNode.h"
 #include "whileLoopNode.h"
 #include "blockNode.h"
@@ -22,6 +24,10 @@
 #include "clockNode.h"
 #include "intNode.h"
 #include "doubleNode.h"
+#include "returninstr.h"
+#include "operatoroperation.h"
+#include "literal.h"
+#include "whileloop.h"
 
 namespace parser {
 
@@ -37,359 +43,330 @@ namespace parser {
 
     unique_ptr<Command> Parser::parseCommand() {
         if (current_token.type == lexer::T_FUNC)
-            parseFuncDef();
+            return std::make_unique<Command>(parseFuncDef());
         else
-            parseInstruction(program);
-
-        return unique_ptr<Command>();
+            return std::make_unique<Command>(parseInstruction());
     }
 
-    void Parser::parseFuncDef() {
-        auto *func_def = new FuncDefNode(program);
-        program->children_nodes.push_back(func_def);
+    unique_ptr<FuncDef> Parser::parseFuncDef() {
         advance();
-        parseIdentifier(func_def);
+        string func_name;
+        parseIdentifier(func_name);
         advance();
-        parseFuncArgs(func_def);
+        vector<string> func_args;
+        parseFuncArgs(func_args);
         advance();
-        parseInstructionsBlock(func_def);
+        vector<unique_ptr<Phrase>> body;
+        parseInstructionsBlock(body);
+        return std::make_unique<FuncDef>(func_name, func_args, body);
     }
 
-    void Parser::parseInstruction(ASTNode *parent) {
+    unique_ptr<Instruction> Parser::parseInstruction() {
 
         if (current_token.type == lexer::T_IDENTIFIER)
-            parseAssignOperator(parent);
+            return std::make_unique<Instruction>(parseAssignOperator());
         else if (current_token.type == lexer::T_IF)
-            parseIf(parent);
+            return std::make_unique<Instruction>(parseIf());
         else if (current_token.type == lexer::T_WHILE)
-            parseWhileLoop(parent);
+            return std::make_unique<Instruction>(parseWhileLoop());
         else if (current_token.type == lexer::T_DOT)
-            parseFuncCall(parent);
+            return std::make_unique<Instruction>(parseFuncCall());
         else if (current_token.type == lexer::T_RET)
-            parseRet(parent);
+            return std::make_unique<Instruction>(parseRet());
         else if (current_token.type == lexer::T_SHOW)
-            parseShowFunc(parent);
-        else
-            parent->children_nodes.push_back(new ErrorNode(parent, "Unrecognised instruction"));
+            return std::make_unique<Instruction>(parseShowFunc());
+        //else
+        //TODO error "Unrecognised instruction"
     }
 
-    void Parser::parseRet(ASTNode *parent) {
-        auto *ret = new ReturnNode(parent);
-        parent->children_nodes.push_back(ret);
+    unique_ptr<ReturnInstr> Parser::parseRet() {
         advance();
         if (current_token.type != lexer::T_PARENTHESES_1) {
-            ret->children_nodes.push_back(new ErrorNode(ret, "Lack of \"(\""));
-            return;
+            //TODO error "Lack of \"(\""
         }
+
         advance();
-        parseArithmeticExpr(ret);
+        unique_ptr<Expression> ret_val = std::move(parseArithmeticExpr());
         advance();
+
         if (current_token.type != lexer::T_PARENTHESES_2) {
-            ret->children_nodes.clear();
-            ret->children_nodes.push_back(new ErrorNode(ret, "Lack of \")\""));
+            //TODO error "Lack of \")\""
         }
+        return std::make_unique<ReturnInstr>(std::move(ret_val));
     }
 
-    void Parser::parseIf(ASTNode *parent) {
-        auto *if_statement = new IfNode(parent);
-        parent->children_nodes.push_back(if_statement);
+    unique_ptr<IfStatement> Parser::parseIf() {
         advance();
-        parseCondition(if_statement);
+        unique_ptr<Expression> cond = std::move(parseCondition());
         advance();
-        parseInstructionsBlock(if_statement);
+        vector<unique_ptr<Phrase>> body;
+        parseInstructionsBlock(body);
         advance();
+        vector<unique_ptr<ElifStat>> elifs;
         while (current_token.type == lexer::T_ELIF) {
-            parseElif(if_statement);
+            elifs.push_back(std::move(parseElif()));
             advance();
         }
 
         if (current_token.type == lexer::T_ELSE) {
-            parseElse(if_statement);
+            elifs.push_back(std::move(parseElse()));
         }
+
+        return std::make_unique<IfStatement>(std::move(cond), body, elifs);
     }
 
-    void Parser::parseWhileLoop(ASTNode *parent) {
-        auto *while_loop = new WhileLoopNode(parent);
-        parent->children_nodes.push_back(while_loop);
+    unique_ptr<WhileLoop> Parser::parseWhileLoop() {
         advance();
-        parseCondition(while_loop);
+        unique_ptr<Expression> cond = std::move(parseCondition());
         advance();
-        parseInstructionsBlock(while_loop);
+        vector<unique_ptr<Phrase>> body;
+        parseInstructionsBlock(body);
+        return std::make_unique<WhileLoop>(std::move(cond), body);
     }
 
-    void Parser::parseAssignOperator(ASTNode *parent) {
-        auto *assign_operation = new AssignOperatorNode(parent);
-        parent->children_nodes.push_back(assign_operation);
-        parseIdentifier(assign_operation);
+    unique_ptr<OperatorOperation> Parser::parseAssignOperator() {
+        string variable_name;
+        parseIdentifier(variable_name);
         advance();
+
         if (current_token.type != lexer::T_ASSIGN) {
-            assign_operation->children_nodes.clear();
-            assign_operation->children_nodes.push_back(
-                    new ErrorNode(assign_operation, "Wrong operator - expected \"=\""));
-            return;
+            //TODO error "Wrong operator - expected \"=\""
         }
+        OperatorType t = OperatorType::ASSIGN;
         advance();
-        if (current_token.type == lexer::T_DOT)
-            parseFuncCall(assign_operation);
-        else
-            parseArithmeticExpr(assign_operation);
+
+        return std::make_unique<OperatorOperation>(t, std::move(std::make_unique<Literal>(variable_name)),
+                                                   std::move(parseArithmeticExpr()));
     }
 
-    void Parser::parseShowFunc(ASTNode *parent) {
-        auto *show_func = new ShowFuncNode(parent);
-        parent->children_nodes.push_back(show_func);
+    unique_ptr<ShowFunc> Parser::parseShowFunc() {
         advance();
-
         if (current_token.type != lexer::T_PARENTHESES_1) {
-            show_func->children_nodes.push_back(new ErrorNode(show_func, "Lack of \"(\""));
-            return;
+            //TODO error "Lack of \"(\""
         }
         advance();
+        vector<unique_ptr<Expression>> args;
         if (current_token.type == lexer::T_STRING)
-            parseString(show_func);
+            args.push_back(std::move(std::make_unique<Literal>(std::get<std::string>(current_token.value),
+                                                               ValueType::STRING)));
         else
-            parseArithmeticExpr(show_func);
+            args.push_back(std::move(parseArithmeticExpr()));
+
         advance();
 
         while (current_token.type == lexer::T_COMMA) {
             advance();
             if (current_token.type == lexer::T_STRING)
-                parseString(show_func);
+                args.push_back(std::move(std::make_unique<Literal>(std::get<std::string>(current_token.value),
+                                                                   ValueType::STRING)));
             else
-                parseArithmeticExpr(show_func);
+                args.push_back(std::move(parseArithmeticExpr()));
             advance();
         }
 
         if (current_token.type != lexer::T_PARENTHESES_2) {
-            show_func->children_nodes.clear();
-            show_func->children_nodes.push_back(new ErrorNode(show_func, "Lack of \")\""));
+            //TODO error "Lack of \")\""
         }
+
+        return std::make_unique<ShowFunc>(args);
     }
 
-    void Parser::parseInstructionsBlock(ASTNode *parent) {
-        auto *block = new BlockNode(parent);
-        parent->children_nodes.push_back(block);
+    void Parser::parseInstructionsBlock(vector<unique_ptr<Phrase>> &instructs) {
         if (current_token.type != lexer::T_BRACE_1) {
-            block->children_nodes.push_back(new ErrorNode(block, "Lack of \"{\""));
-            return;
+            //TODO error "Lack of \"{\""
         }
         advance();
+
         while (current_token.type != lexer::T_END && current_token.type != lexer::T_BRACE_2) {
-            parseInstruction(block);
+            instructs.push_back(std::move(parseInstruction()));
             advance();
         }
 
         if (current_token.type != lexer::T_BRACE_2) {
-            block->children_nodes.clear();
-            block->children_nodes.push_back(new ErrorNode(block, "Lack of \"}\""));
-            return;
+            //TODO error "Lack of \"}\""
         }
     }
 
-    void Parser::parseElif(ASTNode *parent) {
-        auto *elif_statement = new ElifNode(parent);
-        parent->children_nodes.push_back(elif_statement);
+    unique_ptr<ElifStat> Parser::parseElif() {
         advance();
-        parseCondition(elif_statement);
+        unique_ptr<Expression> cond = std::move(parseCondition());
         advance();
-        parseInstructionsBlock(elif_statement);
+        vector<unique_ptr<Phrase>> body;
+        parseInstructionsBlock(body);
+        return std::make_unique<ElifStat>(std::move(cond), body);
     }
 
-    void Parser::parseElse(ASTNode *parent) {
-        auto *else_statement = new ElseNode(parent);
-        parent->children_nodes.push_back(else_statement);
+    unique_ptr<ElifStat> Parser::parseElse() {
         advance();
-        parseInstructionsBlock(else_statement);
+        vector<unique_ptr<Phrase>> body;
+        parseInstructionsBlock(body);
+        return std::make_unique<ElifStat>(std::move(std::make_unique<Literal>(true)), body);
     }
 
-    void Parser::parseIdentifier(ASTNode *parent) {
+    void Parser::parseIdentifier(string &ident) {
+        ident.clear();
         if (current_token.type == lexer::T_IDENTIFIER) {
-            auto *id = new IdentifierNode(parent);
-            id->identifier = std::get<std::string>(current_token.value);
-            parent->children_nodes.push_back(id);
-        } else
-            parent->children_nodes.push_back(new ErrorNode(parent, "Expected identifier"));
+            ident = std::get<std::string>(current_token.value);
+        }
+        //else
+        //TODO error "Expected identifier"
     }
 
-    void Parser::parseFuncArgs(ASTNode *parent) {
-        auto *func_args = new FuncArgsNode(parent);
-        parent->children_nodes.push_back(func_args);
-
+    void Parser::parseFuncArgs(vector<string> &args) {
+        args.clear();
         if (current_token.type != lexer::T_PARENTHESES_1) {
-            func_args->children_nodes.push_back(new ErrorNode(func_args, "Lack of \"(\""));
-            return;
+            //TODO error "Lack of \"(\""
         }
         advance();
 
         if (current_token.type == lexer::T_IDENTIFIER) {
-            parseIdentifier(func_args);
+            string ident;
+            parseIdentifier(ident);
+            args.push_back(ident);
             advance();
             while (current_token.type == lexer::T_COMMA) {
                 advance();
-                parseIdentifier(func_args);
+                parseIdentifier(ident);
+                args.push_back(ident);
                 advance();
             }
         }
 
         if (current_token.type != lexer::T_PARENTHESES_2) {
-            func_args->children_nodes.clear();
-            func_args->children_nodes.push_back(new ErrorNode(func_args, "Lack of \")\""));
+            //TODO error "Lack of \")\""
         }
     }
 
-    void Parser::parseFuncCall(ASTNode *parent) {
-        auto *func_call = new FuncCallNode(parent);
-        parent->children_nodes.push_back(func_call);
+    unique_ptr<FuncCall> Parser::parseFuncCall() {  //TODO jako argumenty tylko zmienne, bez wyrażeń ...
         advance();
-        parseIdentifier(func_call);
+        string func_name;
+        parseIdentifier(func_name);
         advance();
-        parseFuncArgs(func_call);
+        vector<string> args;
+        parseFuncArgs(args);
+        return std::make_unique<FuncCall>(func_name, args);
     }
 
-    void Parser::parseString(ASTNode *parent) {
-        auto *string_node = new StringNode(parent);
-        parent->children_nodes.push_back(string_node);
-        string_node->str = std::get<std::string>(current_token.value);
-    }
-
-    void Parser::parseCondition(ASTNode *parent) {
-        auto *condition = new ConditionNode(parent);
-        parent->children_nodes.push_back(condition);
-
+    unique_ptr<Expression> Parser::parseCondition() {
         if (current_token.type != lexer::T_PARENTHESES_1) {
-            condition->children_nodes.push_back(new ErrorNode(condition, "Lack of \"(\""));
-            return;
+            //TODO error "Lack of \"(\""
         }
 
         advance();
-        parseLogicalExpr(condition);
+        unique_ptr<Expression> cond = std::move(parseLogicalExpr());
         advance();
 
         if (current_token.type != lexer::T_PARENTHESES_2) {
-            condition->children_nodes.clear();
-            condition->children_nodes.push_back(new ErrorNode(condition, "Lack of \")\""));
+            //TODO error "Lack of \")\""
         }
+
+        return cond;
     }
 
-    void Parser::parseLogicalExpr(ASTNode *parent) {
-        auto *binary_operation = new BinaryOperatorsNode(parent);
-        parent->children_nodes.push_back(binary_operation);
-        parseComparisonExpr(binary_operation);
+    unique_ptr<Expression> Parser::parseLogicalExpr() {
+        unique_ptr<Expression> first_operand = std::move(parseComparisonExpr());
         advance();
         if (current_token.type == lexer::T_OR || current_token.type == lexer::T_AND) {
+            OperatorType op_type;
             if (current_token.type == lexer::T_OR)
-                binary_operation->operator_type = OR;
+                op_type = OperatorType::OR;
             else if (current_token.type == lexer::T_AND)
-                binary_operation->operator_type = AND;
+                op_type = OperatorType::AND;
             advance();
-            parseLogicalExpr(binary_operation);
-        } else {
-            parent->children_nodes.insert(parent->children_nodes.begin(), binary_operation->children_nodes[0]);
-            parent->children_nodes[0]->parent_node = parent;
-            binary_operation->children_nodes[0] = nullptr;
-            binary_operation->children_nodes.clear();
-            parent->children_nodes.pop_back();
+            return std::make_unique<OperatorOperation>(op_type, std::move(first_operand),
+                                                       std::move(parseLogicalExpr()));
         }
+
+        return first_operand;
     }
 
-    void Parser::parseComparisonExpr(ASTNode *parent) {
-        auto *binary_operation = new BinaryOperatorsNode(parent);
-        parent->children_nodes.push_back(binary_operation);
-        parseArithmeticExpr(binary_operation);
+    unique_ptr<Expression> Parser::parseComparisonExpr() {
+        unique_ptr<Expression> first_operand = std::move(parseArithmeticExpr());
         advance();
+        OperatorType op_type;
         if (current_token.type == lexer::T_EQUAL)
-            binary_operation->operator_type = EQUAL;
+            op_type = OperatorType::EQUAL;
         else if (current_token.type == lexer::T_NOT_EQUAL)
-            binary_operation->operator_type = NOT_EQUAL;
+            op_type = OperatorType::NOT_EQUAL;
         else if (current_token.type == lexer::T_GREATER)
-            binary_operation->operator_type = GREATER;
+            op_type = OperatorType::GREATER;
         else if (current_token.type == lexer::T_GREATER_E)
-            binary_operation->operator_type = GREATER_EQUAL;
+            op_type = OperatorType::GREATER_EQUAL;
         else if (current_token.type == lexer::T_LESS)
-            binary_operation->operator_type = LESS;
+            op_type = OperatorType::LESS;
         else if (current_token.type == lexer::T_LESS_E)
-            binary_operation->operator_type = LESS_EQUAL;
+            op_type = OperatorType::LESS_EQUAL;
         else {
-            binary_operation->children_nodes.clear();
-            binary_operation->children_nodes.push_back(
-                    new ErrorNode(binary_operation, "Wrong operator - expected comparison operator"));
-            return;
+            //TODO error "Wrong operator - expected comparison operator"
         }
         advance();
-        parseArithmeticExpr(binary_operation);
+
+        return std::make_unique<OperatorOperation>(op_type, std::move(first_operand), std::move(parseArithmeticExpr()));
     }
 
-    void Parser::parseArithmeticExpr(ASTNode *parent) {
-        auto *binary_operation = new BinaryOperatorsNode(parent);
-        parent->children_nodes.push_back(binary_operation);
-        parseMultiplicativeExpr(binary_operation);
+    unique_ptr<Expression> Parser::parseArithmeticExpr() {
+        unique_ptr<Expression> first_operand = std::move(parseMultiplicativeExpr());
         advance();
+
         if (current_token.type == lexer::T_PLUS || current_token.type == lexer::T_MINUS) {
+
+            OperatorType op_type;
             if (current_token.type == lexer::T_PLUS)
-                binary_operation->operator_type = PLUS;
+                op_type = OperatorType::PLUS;
             else if (current_token.type == lexer::T_MINUS)
-                binary_operation->operator_type = MINUS;
+                op_type = OperatorType::MINUS;
             advance();
-            parseArithmeticExpr(binary_operation);
-        } else {
-            parent->children_nodes.insert(parent->children_nodes.begin(), binary_operation->children_nodes[0]);
-            parent->children_nodes[0]->parent_node = parent;
-            binary_operation->children_nodes[0] = nullptr;
-            binary_operation->children_nodes.clear();
-            parent->children_nodes.pop_back();
+            return std::make_unique<OperatorOperation>(op_type, std::move(first_operand),
+                                                       std::move(parseArithmeticExpr()));
         }
+
+        return first_operand;
     }
 
-    void Parser::parseMultiplicativeExpr(ASTNode *parent) {
-        auto *binary_operation = new BinaryOperatorsNode(parent);
-        parent->children_nodes.push_back(binary_operation);
-        parseFactor(binary_operation);
+    unique_ptr<Expression> Parser::parseMultiplicativeExpr() {
+        unique_ptr<Expression> first_operand = std::move(parseFactor());
         advance();
+
         if (current_token.type == lexer::T_MULTIPLY || current_token.type == lexer::T_DIVIDE) {
+            OperatorType op_type;
             if (current_token.type == lexer::T_MULTIPLY)
-                binary_operation->operator_type = MULTIPLY;
+                op_type = OperatorType::MULTIPLY;
             else if (current_token.type == lexer::T_DIVIDE)
-                binary_operation->operator_type = DIVIDE;
+                op_type = OperatorType::DIVIDE;
             advance();
-            parseMultiplicativeExpr(binary_operation);
-        } else {
-            parent->children_nodes.insert(parent->children_nodes.begin(), binary_operation->children_nodes[0]);
-            parent->children_nodes[0]->parent_node = parent;
-            binary_operation->children_nodes[0] = nullptr;
-            binary_operation->children_nodes.clear();
-            parent->children_nodes.pop_back();
+            return std::make_unique<OperatorOperation>(op_type, std::move(first_operand),
+                                                       std::move(parseMultiplicativeExpr()));
         }
+
+        return first_operand;
     }
 
-    void Parser::parseFactor(ASTNode *parent) {
-        if (current_token.type == lexer::T_MINUS) {
-            auto *unary_minus = new UnaryOperatorNode(parent);
-            parent->children_nodes.push_back(unary_minus);
-            advance();
-            parseValue(unary_minus);
-        } else
-            parseValue(parent);
+    unique_ptr<Expression> Parser::parseFactor() {
+        if (current_token.type == lexer::T_MINUS)
+            return std::make_unique<OperatorOperation>(std::move(parseValue()));
+        else
+            return parseValue();
     }
 
-    void Parser::parseValue(ASTNode *parent) {
-        if (current_token.type == lexer::T_IDENTIFIER)
-            parseIdentifier(parent);
-        else if (current_token.type == lexer::T_DOT)
-            parseFuncCall(parent);
+    unique_ptr<Expression> Parser::parseValue() {
+        if (current_token.type == lexer::T_IDENTIFIER) {
+            string variable_name;
+            parseIdentifier(variable_name);
+            return std::make_unique<Literal>(variable_name);
+        } else if (current_token.type == lexer::T_DOT)
+            return parseFuncCall();
         else if (current_token.type == lexer::T_PARENTHESES_1) {
             advance();
-            parseArithmeticExpr(parent);
+            return parseArithmeticExpr();
             advance();
             if (current_token.type != lexer::T_PARENTHESES_2) {
-                parent->children_nodes.clear();
-                parent->children_nodes.push_back(new ErrorNode(parent, "Lack of \")\""));
-                return;
+                //TODO error "Lack of \")\""
             }
         } else
-            parseNumericAndTimeValue(parent);
+            return parseNumericAndTimeValue();
     }
 
-    void Parser::parseNumericAndTimeValue(ASTNode *parent) {
+    unique_ptr<Expression> Parser::parseNumericAndTimeValue() {
         if (current_token.type == lexer::T_DATE) {
             auto *date = new DateNode(parent);
             date->moment = std::get<lexer::TimeMoment>(current_token.value);
@@ -411,8 +388,8 @@ namespace parser {
         } else if (current_token.type == lexer::T_HOUR_U || current_token.type == lexer::T_MIN_U ||
                    current_token.type == lexer::T_SEC_U) {
             parseTimeUnit(parent);
-        } else
-            parent->children_nodes.push_back(new ErrorNode(parent, "Expected number, time moment or time period"));
+        } //else
+        //TODO error "Expected number, time moment or time period"
     }
 
     void Parser::parseNumbers(ASTNode *parent) {
