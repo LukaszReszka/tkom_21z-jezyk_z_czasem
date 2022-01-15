@@ -1,8 +1,8 @@
 #ifndef JEZYK_Z_CZASEM_EXPRESSION_H
 #define JEZYK_Z_CZASEM_EXPRESSION_H
 
-#include <memory>
 #include "value.h"
+#include <memory>
 
 namespace parser {
     class Expression {

@@ -1,3 +1,4 @@
+#include <string>
 #include "programtree.h"
 
 namespace parser {

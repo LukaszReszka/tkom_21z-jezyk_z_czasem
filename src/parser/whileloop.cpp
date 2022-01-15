@@ -1,3 +1,6 @@
+#include <memory>
+#include <vector>
+#include <string>
 #include "whileloop.h"
 
 namespace parser {

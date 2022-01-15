@@ -2,8 +2,6 @@
 #define JEZYK_Z_CZASEM_OPERATOROPERATION_H
 
 #include "expression.h"
-#include <string>
-#include <memory>
 
 namespace parser {
     enum OperatorType {

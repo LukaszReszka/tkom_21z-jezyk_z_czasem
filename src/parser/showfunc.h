@@ -3,9 +3,6 @@
 
 #include "phrase.h"
 #include "expression.h"
-#include <string>
-#include <vector>
-#include <memory>
 
 namespace parser {
     class ShowFunc : public Phrase {

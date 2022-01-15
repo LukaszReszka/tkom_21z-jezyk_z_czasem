@@ -2,35 +2,34 @@ project(Jezyk_z_czasem)
 
 # All sources that also need to be tested in unit tests go into a static library
 add_library(parser STATIC
-        astNode.h
-        programNode.h
-        returnNode.h
-        errorNode.h
+        phrase.h
+        value.h
+        expression.h
+        literal.cpp
+        literal.h
+        operatoroperation.cpp
+        operatoroperation.h
+        funcdef.cpp
+        funcdef.h
+        funccall.cpp
+        funccall.h
+        returninstr.cpp
+        returninstr.h
+        showfunc.cpp
+        showfunc.h
+        whileloop.cpp
+        whileloop.h
+        ifstatement.cpp
+        ifstatement.h
+        elifstat.cpp
+        elifstat.h
+        instruction.cpp
+        instruction.h
+        command.cpp
+        command.h
+        programtree.cpp
+        programtree.h
         parser.h
-        parser.cpp
-        whileLoopNode.h
-        blockNode.h
-        ifNode.h
-        elifNode.h
-        elseNode.h
-        funcDefNode.h
-        identifierNode.h
-        funcArgsNode.h
-        funcCallNode.h
-        assignOperatorNode.h
-        showFuncNode.h
-        stringNode.h
-        conditionNode.h
-        binaryOperators.h
-        binaryOperatorsNode.h
-        unaryOperatorNode.h
-        timePeriodNode.h
-        dateNode.h
-        timestampNode.h
-        clockNode.h
-        intNode.h
-        doubleNode.h
-        unaryOperators.h
-        phrase.h expression.h programtree.cpp programtree.h command.cpp command.h funcdef.cpp funcdef.h instruction.cpp instruction.h funccall.cpp funccall.h returninstr.cpp returninstr.h value.h operatoroperation.cpp operatoroperation.h literal.cpp literal.h showfunc.cpp showfunc.h whileloop.cpp whileloop.h ifstatement.cpp ifstatement.h elifstat.cpp elifstat.h)
+        parser.cpp)
 
 target_include_directories(parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

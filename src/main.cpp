@@ -3,9 +3,6 @@
  * */
 
 #include <iostream>
-#include <memory>
-#include "codeSource/codeSource.h"
-#include "lexer/lexer.h"
 #include "parser/parser.h"
 
 int main() {

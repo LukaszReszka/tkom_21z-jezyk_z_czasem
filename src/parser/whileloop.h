@@ -1,9 +1,6 @@
 #ifndef JEZYK_Z_CZASEM_WHILELOOP_H
 #define JEZYK_Z_CZASEM_WHILELOOP_H
 
-#include <memory>
-#include <string>
-#include <vector>
 #include "phrase.h"
 #include "expression.h"
 

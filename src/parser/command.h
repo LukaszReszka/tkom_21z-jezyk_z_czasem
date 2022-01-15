@@ -1,12 +1,8 @@
 #ifndef JEZYK_Z_CZASEM_COMMAND_H
 #define JEZYK_Z_CZASEM_COMMAND_H
 
-#include "phrase.h"
-#include "funcdef.h"
-#include "phrase.h"
-#include <string>
-#include <variant>
 #include <memory>
+#include "funcdef.h"
 
 namespace parser {
     class Command : public Phrase {

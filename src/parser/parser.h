@@ -2,12 +2,7 @@
 #define JEZYK_Z_CZASEM_PARSER_H
 
 #include "../lexer/lexer.h"
-#include "programNode.h"
 #include "programtree.h"
-#include "command.h"
-#include "returninstr.h"
-#include "showfunc.h"
-#include "whileloop.h"
 #include "ifstatement.h"
 #include "operatoroperation.h"
 #include <memory>
@@ -77,9 +72,9 @@ namespace parser {
 
         unique_ptr<Expression> parseNumericAndTimeValue();
 
-        void parseTimeUnit(ASTNode *parent);
+        unique_ptr<Expression> parseTimeUnit();
 
-        void parseNumbers(ASTNode *parent);
+        unique_ptr<Expression> parseNumb();
     };
 }
 

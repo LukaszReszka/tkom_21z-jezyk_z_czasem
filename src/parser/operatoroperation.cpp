@@ -1,3 +1,5 @@
+#include <memory>
+#include <string>
 #include "operatoroperation.h"
 
 namespace parser {

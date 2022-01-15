@@ -2,8 +2,6 @@
 #define JEZYK_Z_CZASEM_FUNCCALL_H
 
 #include "expression.h"
-#include <string>
-#include <memory>
 #include <vector>
 
 namespace parser {

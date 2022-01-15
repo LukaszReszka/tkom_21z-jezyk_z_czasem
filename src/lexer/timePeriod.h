@@ -9,6 +9,10 @@ namespace lexer {
         std::chrono::seconds s = std::chrono::seconds(0);
         std::chrono::minutes m = std::chrono::minutes(0);
         std::chrono::hours h = std::chrono::hours(0);
+
+        [[nodiscard]] inline std::chrono::seconds getSecNumb() const {
+            return h + m + s;
+        }
     };
 }
 

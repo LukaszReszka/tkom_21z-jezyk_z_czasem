@@ -3,8 +3,6 @@
 
 #include "phrase.h"
 #include "command.h"
-#include <vector>
-#include <memory>
 
 namespace parser {
     class ProgramTree : public Phrase {

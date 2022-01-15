@@ -1,13 +1,10 @@
 #ifndef JEZYK_Z_CZASEM_INSTRUCTION_H
 #define JEZYK_Z_CZASEM_INSTRUCTION_H
 
-#include "phrase.h"
 #include "funccall.h"
 #include "returninstr.h"
 #include "showfunc.h"
 #include "whileloop.h"
-#include <memory>
-#include <variant>
 
 namespace parser {
     class Instruction : public Phrase {

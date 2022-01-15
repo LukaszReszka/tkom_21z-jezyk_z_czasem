@@ -1,3 +1,4 @@
+#include <string>
 #include "command.h"
 
 namespace parser {

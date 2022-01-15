@@ -1,3 +1,4 @@
+#include <memory>
 #include "funccall.h"
 
 namespace parser {

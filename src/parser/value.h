@@ -1,10 +1,8 @@
 #ifndef JEZYK_Z_CZASEM_VALUE_H
 #define JEZYK_Z_CZASEM_VALUE_H
 
-#include <variant>
-#include <string>
 #include <chrono>
-#include "../lexer/timeMoment.h"
+#include "../lexer/lexer.h"
 
 using std::chrono::seconds, std::chrono::minutes, std::chrono::hours;
 using std::ratio, std::chrono::duration;
@@ -13,7 +11,7 @@ namespace parser {
     enum ValueType {
         INT, DOUBLE,
         STRING, BOOL,
-        TIME_PERIOD, DATE, TIMESTAMP,
+        TIME_PERIOD, DATE, TIMESTAMP, CLOCK,
         INT_S, INT_MIN, INT_H,
         DOUBLE_S, DOUBLE_MIN, DOUBLE_H,
         VARIABLE
@@ -35,8 +33,9 @@ namespace parser {
             duration<double, ratio<60>> double_min;
             duration<double, ratio<3600>> double_h;
             lexer::TimeMoment timeMoment;
-            std::string text;
         } value;
+
+        std::string value_str;
     };
 }
 

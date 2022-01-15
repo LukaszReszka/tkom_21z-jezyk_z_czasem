@@ -1,12 +1,7 @@
 #ifndef JEZYK_Z_CZASEM_IFSTATEMENT_H
 #define JEZYK_Z_CZASEM_IFSTATEMENT_H
 
-#include "phrase.h"
-#include "expression.h"
 #include "elifstat.h"
-#include <memory>
-#include <string>
-#include <vector>
 
 namespace parser {
     class IfStatement : public Phrase {
