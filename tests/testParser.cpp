@@ -45,9 +45,9 @@ TEST_CASE("Function definition") {
         code = "FUNC fun() {}";
         right_tree = "PROGRAM ROOT\n"
                      "-Function Definition\n"
-                     "--Identifier: fun\n"
-                     "--Function Arguments\n"
-                     "--Instructions Block\n";
+                     "--Name: fun\n"
+                     "--Parameters:\n"
+                     "--Function Body:\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -56,13 +56,14 @@ TEST_CASE("Function definition") {
         code = "FUNC fun(a, b) { SHOW(\"test definiowania funkcji\")}";
         right_tree = "PROGRAM ROOT\n"
                      "-Function Definition\n"
-                     "--Identifier: fun\n"
-                     "--Function Arguments\n"
-                     "---Identifier: a\n"
-                     "---Identifier: b\n"
-                     "--Instructions Block\n"
-                     "---SHOW Function\n"
-                     "----STRING: test definiowania funkcji\n";
+                     "--Name: fun\n"
+                     "--Parameters:\n"
+                     "---a\n"
+                     "---b\n"
+                     "--Function Body:\n"
+                     "---SHOW\n"
+                     "----Arguments:\n"
+                     "-----STRING: test definiowania funkcji\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -72,8 +73,9 @@ TEST_CASE("SHOW Function") {
     SUBCASE("With string argument") {
         code = "SHOW(\"Ala ma kota\")";
         right_tree = "PROGRAM ROOT\n"
-                     "-SHOW Function\n"
-                     "--STRING: Ala ma kota\n";
+                     "-SHOW\n"
+                     "--Arguments:\n"
+                     "---STRING: Ala ma kota\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -81,9 +83,10 @@ TEST_CASE("SHOW Function") {
     SUBCASE("With string arguments - with escaping \"") {
         code = R"(SHOW("He said \"no\"", "She replied \"yes\""))";
         right_tree = "PROGRAM ROOT\n"
-                     "-SHOW Function\n"
-                     "--STRING: He said \"no\"\n"
-                     "--STRING: She replied \"yes\"\n";
+                     "-SHOW\n"
+                     "--Arguments:\n"
+                     "---STRING: He said \"no\"\n"
+                     "---STRING: She replied \"yes\"\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -93,10 +96,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning int number") {
         code = "a = 2";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--INT: 2\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---INT: 2\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -104,11 +108,13 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning negative int number") {
         code = "a = -9";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Arithmetic NEGATION\n"
-                     "---INT: 9\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---Operator UNARY_MINUS\n"
+                     "----First Operand:\n"
+                     "-----INT: 9\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -116,10 +122,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning double number") {
         code = "pi_numb = 3.14";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--DOUBLE: 3.140000\n"
-                     "-is assigned to\n"
-                     "--Identifier: pi_numb\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: pi_numb\n"
+                     "--Second Operand:\n"
+                     "---DOUBLE: 3.140000\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -127,11 +134,13 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning negative double number") {
         code = "negative_PI = -3.14";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Arithmetic NEGATION\n"
-                     "---DOUBLE: 3.140000\n"
-                     "-is assigned to\n"
-                     "--Identifier: negative_PI\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: negative_PI\n"
+                     "--Second Operand:\n"
+                     "---Operator UNARY_MINUS\n"
+                     "----First Operand:\n"
+                     "-----DOUBLE: 3.140000\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -139,10 +148,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning another variable") {
         code = "a = b";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Identifier: b\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---VARIABLE: b\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -150,14 +160,15 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning result from function call") {
         code = "a = .func(arg1, arg2)";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Identifier: a\n"
-                     "-is assigned to\n"
-                     "--Function Call\n"
-                     "---Identifier: func\n"
-                     "---Function Arguments\n"
-                     "----Identifier: arg1\n"
-                     "----Identifier: arg2\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---Function Call\n"
+                     "----Name: func\n"
+                     "----Arguments:\n"
+                     "-----arg1\n"
+                     "-----arg2\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -165,10 +176,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning time period") {
         code = "a = [+2:30:54]";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Time period: 2 h 30 m 54 s\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---TIME_PERIOD [s]: 9054\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -176,10 +188,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning time moment - clock") {
         code = "a = [^12:59:22]";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Time moment - clock: 12:59:22\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---CLOCK: 12:59:22\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -187,10 +200,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning time moment - date") {
         code = "a = [13/12/2021]";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Time moment - date: 13/12/2021\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---DATE: 13/12/2021\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -198,10 +212,11 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning time moment - timestamp") {
         code = "a = [24/12/2021 18:15:40]";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--Time moment - timestamp: 24/12/2021 18:15:40\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---TIMESTAMP: 24/12/2021 18:15:40\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -209,31 +224,34 @@ TEST_CASE("Assign operator") {
     SUBCASE("Assigning expression - multiplication") {
         code = "a = [h]3 * 2";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--MULTIPLY operation\n"
-                     "---INT: 2\n"
-                     "---Convert to HOURS\n"
-                     "----INT: 3\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---Operator MULTIPLY\n"
+                     "----First Operand:\n"
+                     "-----HOURS (int): 3\n"
+                     "----Second Operand:\n"
+                     "-----INT: 2\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
 
     SUBCASE("Assigning expression - division") {
-        code = "a = [m]60 / 2.5";
+        code = "a = [m]60 / 2";
         right_tree = "PROGRAM ROOT\n"
-                     "-Assign Operation\n"
-                     "--DIVIDE operation\n"
-                     "---DOUBLE: 2.500000\n"
-                     "---Convert to MINUTES\n"
-                     "----INT: 60\n"
-                     "-is assigned to\n"
-                     "--Identifier: a\n";
+                     "-Operator ASSIGN\n"
+                     "--First Operand:\n"
+                     "---VARIABLE: a\n"
+                     "--Second Operand:\n"
+                     "---Operator DIVIDE\n"
+                     "----First Operand:\n"
+                     "-----MINUTES (int): 60\n"
+                     "----Second Operand:\n"
+                     "-----INT: 2\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
-
 }
 
 

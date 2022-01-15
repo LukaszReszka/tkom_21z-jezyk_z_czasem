@@ -13,7 +13,7 @@ namespace parser {
     class Literal : public Expression {
     public:
 
-        Literal() = default;
+        Literal() { val = std::make_unique<Value>(); }
 
         Literal(lexer::TimeMoment &tm, ValueType type);
 

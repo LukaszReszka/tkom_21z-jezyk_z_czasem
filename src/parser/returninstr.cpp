@@ -6,7 +6,7 @@ namespace parser {
 
     std::string ReturnInstr::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "RET\n" + returned_value->toString(depth + 1);
 

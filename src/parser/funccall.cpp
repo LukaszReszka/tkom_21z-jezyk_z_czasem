@@ -6,7 +6,7 @@ namespace parser {
 
     std::string FuncCall::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "Function Call\n";
         hyphens += "-";

@@ -3,13 +3,14 @@
 namespace parser {
 
     Literal::Literal(lexer::TimeMoment &tm, ValueType type) {
+        val = std::make_unique<Value>();
         val->type = type;
-        val->value.timeMoment = tm;
+        val->timeMoment = tm;
     }
 
     std::string Literal::toString(int depth) {
         std::string text_repr;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             text_repr += "-";
 
         if (val->type == INT) {
@@ -23,19 +24,19 @@ namespace parser {
         } else if (val->type == VARIABLE) {
             text_repr += "VARIABLE: " + val->value_str;
         } else if (val->type == TIME_PERIOD) {
-            text_repr += "TIME_PRESION [s]: " + std::to_string(val->value.int_s.count());
+            text_repr += "TIME_PERIOD [s]: " + std::to_string(val->value.int_s.count());
         } else if (val->type == DATE) {
-            lexer::TimeMoment tm = val->value.timeMoment;
+            lexer::TimeMoment tm = val->timeMoment;
             text_repr += "DATE: " + std::to_string(tm.getDay()) + "/" + std::to_string(tm.getMonth()) + "/" +
                          std::to_string(tm.getYear());
         } else if (val->type == TIMESTAMP) {
-            lexer::TimeMoment tm = val->value.timeMoment;
-            text_repr += "DATE: " + std::to_string(tm.getDay()) + "/" + std::to_string(tm.getMonth()) + "/" +
+            lexer::TimeMoment tm = val->timeMoment;
+            text_repr += "TIMESTAMP: " + std::to_string(tm.getDay()) + "/" + std::to_string(tm.getMonth()) + "/" +
                          std::to_string(tm.getYear()) + " " + std::to_string(tm.getHour()) + ":" +
                          std::to_string(tm.getMin()) + ":" +
                          std::to_string(tm.getSec());
         } else if (val->type == CLOCK) {
-            lexer::TimeMoment tm = val->value.timeMoment;
+            lexer::TimeMoment tm = val->timeMoment;
             text_repr += "CLOCK: " + std::to_string(tm.getHour()) + ":" + std::to_string(tm.getMin()) + ":" +
                          std::to_string(tm.getSec());
         } else if (val->type == INT_S) {

@@ -12,7 +12,7 @@ namespace parser {
 
     std::string ShowFunc::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "SHOW\n" + hyphens + "-Arguments:\n";
 

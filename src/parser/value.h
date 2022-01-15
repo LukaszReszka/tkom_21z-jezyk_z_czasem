@@ -32,10 +32,10 @@ namespace parser {
             duration<double> double_s;
             duration<double, ratio<60>> double_min;
             duration<double, ratio<3600>> double_h;
-            lexer::TimeMoment timeMoment;
         } value;
 
         std::string value_str;
+        lexer::TimeMoment timeMoment;
     };
 }
 

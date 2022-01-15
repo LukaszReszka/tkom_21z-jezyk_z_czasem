@@ -13,7 +13,7 @@ namespace parser {
 
     std::string WhileLoop::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "WHILE\n";
         hyphens += "-";

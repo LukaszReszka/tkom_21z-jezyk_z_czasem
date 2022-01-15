@@ -14,7 +14,7 @@ namespace parser {
 
     std::string IfStatement::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "IF\n";
         hyphens += "-";

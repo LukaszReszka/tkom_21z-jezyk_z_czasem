@@ -13,7 +13,7 @@ namespace parser {
 
     std::string ElifStat::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "ELIF\n";
         hyphens += "-";

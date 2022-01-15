@@ -11,7 +11,7 @@ namespace parser {
 
     std::string FuncDef::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "Function Definition\n";
         hyphens += "-";
@@ -25,7 +25,7 @@ namespace parser {
         for (auto &i: func_body)
             text_rep += i->toString(depth + 2);
 
-        return std::string();
+        return text_rep;
     }
 
     void FuncDef::execute() {

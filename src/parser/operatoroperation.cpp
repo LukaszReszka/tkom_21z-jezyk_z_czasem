@@ -11,7 +11,7 @@ namespace parser {
 
     std::string OperatorOperation::toString(int depth) {
         std::string hyphens;
-        while (depth--)
+        for (int i = 0; i < depth; ++i)
             hyphens += "-";
         std::string text_rep = hyphens + "Operator ";
         hyphens += "-";
@@ -44,8 +44,9 @@ namespace parser {
         else if (type == OperatorType::ASSIGN)
             text_rep += "ASSIGN";
 
-        text_rep += "\n" + hyphens + "First Operand: " + first_operand->toString(depth + 2);
-        text_rep += "\n" + hyphens + "Second Operand: " + second_operand->toString(depth + 2);
+        text_rep += "\n" + hyphens + "First Operand:\n" + first_operand->toString(depth + 2);
+        if (type != OperatorType::UNARY_MINUS)
+            text_rep += hyphens + "Second Operand:\n" + second_operand->toString(depth + 2);
 
         return text_rep;
     }
