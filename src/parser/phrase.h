@@ -1,6 +1,8 @@
 #ifndef JEZYK_Z_CZASEM_PHRASE_H
 #define JEZYK_Z_CZASEM_PHRASE_H
 
+#include <string>
+
 namespace parser {
     class Phrase {
     public:

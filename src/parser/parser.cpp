@@ -11,7 +11,7 @@ namespace parser {
         advance();
         unique_ptr<ProgramTree> programTree(new ProgramTree());
         while (current_token.type != lexer::T_END) {
-            programTree->addCommand(parseCommand());
+            programTree->addCommand(std::move(parseCommand()));
             advance();
         }
         return programTree;
@@ -19,9 +19,9 @@ namespace parser {
 
     unique_ptr<Command> Parser::parseCommand() {
         if (current_token.type == lexer::T_FUNC)
-            return std::make_unique<Command>(parseFuncDef());
+            return std::make_unique<Command>(std::move(parseFuncDef()));
         else
-            return std::make_unique<Command>(parseInstruction());
+            return std::make_unique<Command>(std::move(parseInstruction()));
     }
 
     unique_ptr<FuncDef> Parser::parseFuncDef() {
@@ -40,17 +40,17 @@ namespace parser {
     unique_ptr<Instruction> Parser::parseInstruction() {
 
         if (current_token.type == lexer::T_IDENTIFIER)
-            return std::make_unique<Instruction>(parseAssignOperator());
+            return std::make_unique<Instruction>(std::move(parseAssignOperator()));
         else if (current_token.type == lexer::T_IF)
-            return std::make_unique<Instruction>(parseIf());
+            return std::make_unique<Instruction>(std::move(parseIf()));
         else if (current_token.type == lexer::T_WHILE)
-            return std::make_unique<Instruction>(parseWhileLoop());
+            return std::make_unique<Instruction>(std::move(parseWhileLoop()));
         else if (current_token.type == lexer::T_DOT)
-            return std::make_unique<Instruction>(parseFuncCall());
+            return std::make_unique<Instruction>(std::move(parseFuncCall()));
         else if (current_token.type == lexer::T_RET)
-            return std::make_unique<Instruction>(parseRet());
+            return std::make_unique<Instruction>(std::move(parseRet()));
         else if (current_token.type == lexer::T_SHOW)
-            return std::make_unique<Instruction>(parseShowFunc());
+            return std::make_unique<Instruction>(std::move(parseShowFunc()));
         //else
         //TODO error "Unrecognised instruction"
     }
@@ -341,7 +341,7 @@ namespace parser {
             unique_ptr<Literal> var = unique_ptr<Literal>();
             var->val->type = ValueType::VARIABLE;
             var->val->value_str = variable_name;
-            return std::move(var);
+            return var;
         } else if (current_token.type == lexer::T_DOT) {
             return parseFuncCall();
         } else if (current_token.type == lexer::T_PARENTHESES_1) {
@@ -353,7 +353,7 @@ namespace parser {
             }
             return arthm;
         } else
-            return parseNumericAndTimeValue();
+            return std::move(parseNumericAndTimeValue());
     }
 
     unique_ptr<Expression> Parser::parseNumericAndTimeValue() {
@@ -367,12 +367,12 @@ namespace parser {
             unique_ptr<Literal> literal = unique_ptr<Literal>();
             literal->val->type = ValueType::TIME_PERIOD;
             literal->val->value.int_s = (std::get<lexer::TimePeriod>(current_token.value)).getSecNumb();
-            return std::move(literal);
+            return literal;
         } else if (current_token.type == lexer::T_INT || current_token.type == lexer::T_DOUBLE) {
-            return parseNumb();
+            return std::move(parseNumb());
         } else if (current_token.type == lexer::T_HOUR_U || current_token.type == lexer::T_MIN_U ||
                    current_token.type == lexer::T_SEC_U) {
-            return parseTimeUnit();
+            return std::move(parseTimeUnit());
         } //else
         //TODO error "Expected number, time moment or time period"
     }
@@ -384,31 +384,31 @@ namespace parser {
             if (current_token.type == lexer::T_INT) {
                 literal->val->type = ValueType::INT_H;
                 literal->val->value.int_h = hours(std::get<int>(current_token.value));
-                return std::move(literal);
+                return literal;
             } else if (current_token.type == lexer::T_DOUBLE) {
                 literal->val->type = ValueType::DOUBLE_H;
                 literal->val->value.double_h = duration<double, ratio<3600>>(std::get<double>(current_token.value));
-                return std::move(literal);
+                return literal;
             }
         } else if (current_token.type == lexer::T_MIN_U) {
             if (current_token.type == lexer::T_INT) {
                 literal->val->type = ValueType::INT_MIN;
                 literal->val->value.int_min = minutes(std::get<int>(current_token.value));
-                return std::move(literal);
+                return literal;
             } else if (current_token.type == lexer::T_DOUBLE) {
                 literal->val->type = ValueType::DOUBLE_MIN;
                 literal->val->value.double_min = duration<double, ratio<60>>(std::get<double>(current_token.value));
-                return std::move(literal);
+                return literal;
             }
         } else if (current_token.type == lexer::T_SEC_U) {
             if (current_token.type == lexer::T_INT) {
                 literal->val->type = ValueType::INT_S;
                 literal->val->value.int_s = seconds(std::get<int>(current_token.value));
-                return std::move(literal);
+                return literal;
             } else if (current_token.type == lexer::T_DOUBLE) {
                 literal->val->type = ValueType::DOUBLE_S;
                 literal->val->value.double_s = duration<double>(std::get<double>(current_token.value));
-                return std::move(literal);
+                return literal;
             }
         }
 
@@ -420,11 +420,10 @@ namespace parser {
         if (current_token.type == lexer::T_INT) {
             literal->val->type = ValueType::INT;
             literal->val->value.integer_numb = std::get<int>(current_token.value);
-            return std::move(literal);
         } else if (current_token.type == lexer::T_DOUBLE) {
             literal->val->type = ValueType::DOUBLE;
             literal->val->value.double_numb = std::get<double>(current_token.value);
-            return std::move(literal);
         }
+        return literal;
     }
 }
