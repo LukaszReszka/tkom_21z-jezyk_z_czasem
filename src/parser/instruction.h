@@ -14,7 +14,7 @@ namespace parser {
 
         Instruction(std::unique_ptr<Expression> instr);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         void execute() override;
 

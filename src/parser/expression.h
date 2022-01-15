@@ -8,13 +8,9 @@ namespace parser {
     class Expression {
     public:
 
-        virtual std::string toString() = 0;
+        virtual std::string toString(int depth) = 0;
 
         virtual std::unique_ptr<Value> evaluate() = 0;
-
-        inline std::ostream &operator<<(std::ostream &os) {
-            return os << toString();
-        }
 
     };
 }

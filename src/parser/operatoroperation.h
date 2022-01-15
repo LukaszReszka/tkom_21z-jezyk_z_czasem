@@ -20,7 +20,7 @@ namespace parser {
 
         explicit OperatorOperation(std::unique_ptr<Expression> op);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         std::unique_ptr<Value> evaluate() override;
 

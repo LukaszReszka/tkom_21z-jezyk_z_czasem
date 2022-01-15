@@ -8,9 +8,9 @@ std::string getTree(const std::string &code) {
     std::stringstream code_to_test(code);
     code_source::CodeSource source(code_to_test);
     lexer::Lexer lexer(source);
-    auto *root = new parser::ProgramNode();
-    parser::Parser parser(lexer, root);
-    return root->getTextRepresentation(0);
+    parser::Parser parser(lexer);
+    unique_ptr<parser::ProgramTree> tree = std::move(parser.parseProgram());
+    return tree->toString();
 }
 
 std::string code, right_tree;
@@ -20,8 +20,8 @@ TEST_CASE("Function call") {
         code = ".func()";
         right_tree = "PROGRAM ROOT\n"
                      "-Function Call\n"
-                     "--Identifier: func\n"
-                     "--Function Arguments\n";
+                     "--Name: func\n"
+                     "--Arguments:\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -30,11 +30,11 @@ TEST_CASE("Function call") {
         code = ".anotherFunc(a98, b_1, c) #inna funkcja#";
         right_tree = "PROGRAM ROOT\n"
                      "-Function Call\n"
-                     "--Identifier: anotherFunc\n"
-                     "--Function Arguments\n"
-                     "---Identifier: a98\n"
-                     "---Identifier: b_1\n"
-                     "---Identifier: c\n";
+                     "--Name: anotherFunc\n"
+                     "--Arguments:\n"
+                     "---a98\n"
+                     "---b_1\n"
+                     "---c\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }

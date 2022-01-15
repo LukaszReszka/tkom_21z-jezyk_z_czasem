@@ -9,7 +9,7 @@ namespace parser {
     public:
         explicit ReturnInstr(std::unique_ptr<Expression> ret_val);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         void execute() override;
 

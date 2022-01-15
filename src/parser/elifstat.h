@@ -11,7 +11,7 @@ namespace parser {
 
         ElifStat(std::unique_ptr<Expression> cond, std::vector<std::unique_ptr<Phrase>> &body);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         void execute() override;
 

@@ -11,7 +11,7 @@ namespace parser {
 
         explicit Command(std::unique_ptr<Instruction> instr);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         void execute() override;
 

@@ -10,7 +10,7 @@ namespace parser {
 
         explicit ShowFunc(std::vector<std::unique_ptr<Expression>> &args);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         void execute() override;
 

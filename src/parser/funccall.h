@@ -10,7 +10,7 @@ namespace parser {
 
         FuncCall(std::string &f_name, std::vector<std::string> &args);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         std::unique_ptr<Value> evaluate() override;
 

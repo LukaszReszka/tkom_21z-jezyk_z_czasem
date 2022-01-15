@@ -11,7 +11,7 @@ namespace parser {
             commands.push_back(std::move(command));
         }
 
-        std::string toString() override;
+        std::string toString(int depth = 0) override;
 
         virtual void execute() override;
 

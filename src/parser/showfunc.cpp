@@ -10,8 +10,16 @@ namespace parser {
             this->args.push_back(std::move(a));
     }
 
-    std::string ShowFunc::toString() {
-        return std::string();
+    std::string ShowFunc::toString(int depth) {
+        std::string hyphens;
+        while (depth--)
+            hyphens += "-";
+        std::string text_rep = hyphens + "SHOW\n" + hyphens + "-Arguments:\n";
+
+        for (auto &a: args)
+            text_rep += a->toString(depth + 2);
+
+        return text_rep;
     }
 
     void ShowFunc::execute() {

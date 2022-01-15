@@ -17,7 +17,7 @@ namespace parser {
 
         Literal(lexer::TimeMoment &tm, ValueType type);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         std::unique_ptr<Value> evaluate() override;
 

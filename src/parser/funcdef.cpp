@@ -9,7 +9,22 @@ namespace parser {
             func_body.push_back(std::move(i));
     }
 
-    std::string FuncDef::toString() {
+    std::string FuncDef::toString(int depth) {
+        std::string hyphens;
+        while (depth--)
+            hyphens += "-";
+        std::string text_rep = hyphens + "Function Definition\n";
+        hyphens += "-";
+        text_rep += hyphens + "Name: " + func_name + "\n" + hyphens + "Parameters:\n";
+
+        for (auto &p: params)
+            text_rep += hyphens + "-" + p + "\n";
+
+        text_rep += hyphens + "Function Body:\n";
+
+        for (auto &i: func_body)
+            text_rep += i->toString(depth + 2);
+
         return std::string();
     }
 

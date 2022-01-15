@@ -9,8 +9,45 @@ namespace parser {
     OperatorOperation::OperatorOperation(std::unique_ptr<Expression> op) : type(UNARY_MINUS),
                                                                            first_operand(std::move(op)) {}
 
-    std::string OperatorOperation::toString() {
-        return std::string();
+    std::string OperatorOperation::toString(int depth) {
+        std::string hyphens;
+        while (depth--)
+            hyphens += "-";
+        std::string text_rep = hyphens + "Operator ";
+        hyphens += "-";
+        if (type == OperatorType::PLUS)
+            text_rep += "PLUS";
+        else if (type == OperatorType::MINUS)
+            text_rep += "MINUS";
+        else if (type == OperatorType::MULTIPLY)
+            text_rep += "MULTIPLY";
+        else if (type == OperatorType::DIVIDE)
+            text_rep += "DIVIDE";
+        else if (type == OperatorType::UNARY_MINUS)
+            text_rep += "UNARY_MINUS";
+        else if (type == OperatorType::OR)
+            text_rep += "OR";
+        else if (type == OperatorType::AND)
+            text_rep += "AND";
+        else if (type == OperatorType::EQUAL)
+            text_rep += "EQUAL";
+        else if (type == OperatorType::NOT_EQUAL)
+            text_rep += "NOT_EQUAL";
+        else if (type == OperatorType::GREATER)
+            text_rep += "GREATER";
+        else if (type == OperatorType::GREATER_EQUAL)
+            text_rep += "GREATER_EQUAL";
+        else if (type == OperatorType::LESS)
+            text_rep += "LESS";
+        else if (type == OperatorType::LESS_EQUAL)
+            text_rep += "LESS_EQUAL";
+        else if (type == OperatorType::ASSIGN)
+            text_rep += "ASSIGN";
+
+        text_rep += "\n" + hyphens + "First Operand: " + first_operand->toString(depth + 2);
+        text_rep += "\n" + hyphens + "Second Operand: " + second_operand->toString(depth + 2);
+
+        return text_rep;
     }
 
     std::unique_ptr<Value> OperatorOperation::evaluate() {

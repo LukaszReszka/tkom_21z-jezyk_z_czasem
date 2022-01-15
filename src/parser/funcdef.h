@@ -8,7 +8,7 @@ namespace parser {
     public:
         FuncDef(std::string &name, std::vector<std::string> &params, std::vector<std::unique_ptr<Phrase>> &body);
 
-        std::string toString() override;
+        std::string toString(int depth) override;
 
         void execute() override;
 
