@@ -2,24 +2,16 @@
  * Autor: Łukasz Reszka (300257)
  * */
 
-#include <iostream>
 #include <sstream>
-#include "parser/parser.h"
+#include "interpreter/interpreter.h"
 
 int main() {
-//    code_source::CodeSource source(std::cin);
-//    lexer::Lexer lexer(source);
-//    parser::Parser parser(lexer);
-//    std::unique_ptr<parser::ProgramTree> programTree = std::move(parser.parseProgram());
-//    std::cout << programTree->toString();
+//    interpreter::Interpreter interpreter(std::cin);
+//    interpreter.showProgramTree();
 
-    string code = "a = [m]60 / 2";
+    string code = "a = 4";
     std::stringstream code_to_test(code);
-    code_source::CodeSource source(code_to_test);
-    lexer::Lexer lexer(source);
-    parser::Parser parser(lexer);
-    unique_ptr<parser::ProgramTree> tree = std::move(parser.parseProgram());
-    std::cout << tree->toString();
-
+    interpreter::Interpreter interpreter(code_to_test);
+    interpreter.showProgramTree();
     return 0;
 }
