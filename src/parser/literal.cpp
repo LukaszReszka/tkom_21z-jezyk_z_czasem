@@ -24,7 +24,7 @@ namespace parser {
         } else if (val->type == VARIABLE) {
             text_repr += "VARIABLE: " + val->value_str;
         } else if (val->type == TIME_PERIOD) {
-            text_repr += "TIME_PERIOD [s]: " + std::to_string(val->value.int_s.count());
+            text_repr += "TIME_PERIOD[s]: " + std::to_string(val->value.int_s.count());
         } else if (val->type == DATE) {
             lexer::TimeMoment tm = val->timeMoment;
             text_repr += "DATE: " + std::to_string(tm.getDay()) + "/" + std::to_string(tm.getMonth()) + "/" +
@@ -40,17 +40,17 @@ namespace parser {
             text_repr += "CLOCK: " + std::to_string(tm.getHour()) + ":" + std::to_string(tm.getMin()) + ":" +
                          std::to_string(tm.getSec());
         } else if (val->type == INT_S) {
-            text_repr += "SECONDS (int): " + std::to_string(val->value.int_s.count());
+            text_repr += "SECONDS(int): " + std::to_string(val->value.int_s.count());
         } else if (val->type == INT_MIN) {
-            text_repr += "MINUTES (int): " + std::to_string(val->value.int_min.count());
+            text_repr += "MINUTES(int): " + std::to_string(val->value.int_min.count());
         } else if (val->type == INT_H) {
-            text_repr += "HOURS (int): " + std::to_string(val->value.int_h.count());
+            text_repr += "HOURS(int): " + std::to_string(val->value.int_h.count());
         } else if (val->type == DOUBLE_S) {
-            text_repr += "SECONDS (double): " + std::to_string(val->value.double_s.count());
+            text_repr += "SECONDS(double): " + std::to_string(val->value.double_s.count());
         } else if (val->type == DOUBLE_MIN) {
-            text_repr += "MINUTES (double): " + std::to_string(val->value.double_min.count());
+            text_repr += "MINUTES(double): " + std::to_string(val->value.double_min.count());
         } else if (val->type == DOUBLE_H) {
-            text_repr += "HOURS (double): " + std::to_string(val->value.double_h.count());
+            text_repr += "HOURS(double): " + std::to_string(val->value.double_h.count());
         }
 
         return text_repr + "\n";

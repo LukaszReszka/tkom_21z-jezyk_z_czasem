@@ -16,6 +16,10 @@ namespace parser {
     }
 
     void Command::execute(std::shared_ptr<interpreter::Context> cont) {
-        
+        if (type == INSTRUCTION)
+            std::get<std::unique_ptr<Instruction>>(phrase)->execute(cont);
+        else {
+
+        }
     }
 }

@@ -12,9 +12,6 @@ namespace parser {
         virtual std::string toString(int depth) = 0;
 
         virtual void execute(std::shared_ptr<interpreter::Context> cont) = 0;
-
-    protected:
-        std::shared_ptr<interpreter::Context> context;
     };
 }
 

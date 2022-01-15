@@ -180,7 +180,7 @@ TEST_CASE("Assign operator") {
                      "--First Operand:\n"
                      "---VARIABLE: a\n"
                      "--Second Operand:\n"
-                     "---TIME_PERIOD [s]: 9054\n";
+                     "---TIME_PERIOD[s]: 9054\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -230,7 +230,7 @@ TEST_CASE("Assign operator") {
                      "--Second Operand:\n"
                      "---Operator MULTIPLY\n"
                      "----First Operand:\n"
-                     "-----HOURS (int): 3\n"
+                     "-----HOURS(int): 3\n"
                      "----Second Operand:\n"
                      "-----INT: 2\n";
 
@@ -246,7 +246,7 @@ TEST_CASE("Assign operator") {
                      "--Second Operand:\n"
                      "---Operator DIVIDE\n"
                      "----First Operand:\n"
-                     "-----MINUTES (int): 60\n"
+                     "-----MINUTES(int): 60\n"
                      "----Second Operand:\n"
                      "-----INT: 2\n";
 
