@@ -56,7 +56,7 @@ namespace parser {
         return text_repr + "\n";
     }
 
-    std::unique_ptr<Value> Literal::evaluate() {
+    std::unique_ptr<Value> Literal::evaluate(std::shared_ptr<interpreter::Context> cont) {
         return std::unique_ptr<Value>();
     }
 }

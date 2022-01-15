@@ -22,7 +22,7 @@ namespace parser {
         return text_rep;
     }
 
-    void ShowFunc::execute() {
+    void ShowFunc::execute(std::shared_ptr<interpreter::Context> cont) {
 
     }
 }

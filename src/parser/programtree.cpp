@@ -9,7 +9,8 @@ namespace parser {
         return text_rep;
     }
 
-    void ProgramTree::execute() {
-
+    void ProgramTree::execute(std::shared_ptr<interpreter::Context> cont) {
+        for (auto &c: commands)
+            c->execute(context);
     }
 }

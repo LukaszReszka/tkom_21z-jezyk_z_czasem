@@ -12,7 +12,7 @@ namespace parser {
 
         std::string toString(int depth) override;
 
-        std::unique_ptr<Value> evaluate() override;
+        std::unique_ptr<Value> evaluate(std::shared_ptr<interpreter::Context> cont) override;
 
     private:
         std::string func_name;

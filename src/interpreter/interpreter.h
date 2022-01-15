@@ -13,9 +13,10 @@ namespace interpreter {
 
         inline void showProgramTree() { std::cout << programTree->toString(); }
 
+        void execudeProgram();
+
     private:
         std::unique_ptr<parser::ProgramTree> programTree;
-
     };
 }
 

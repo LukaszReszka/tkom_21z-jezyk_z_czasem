@@ -19,7 +19,7 @@ namespace parser {
         return text_rep;
     }
 
-    std::unique_ptr<Value> FuncCall::evaluate() {
+    std::unique_ptr<Value> FuncCall::evaluate(std::shared_ptr<interpreter::Context> cont) {
         return std::unique_ptr<Value>();
     }
 }

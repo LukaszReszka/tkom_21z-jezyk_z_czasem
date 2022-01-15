@@ -4,6 +4,8 @@ project(Jezyk_z_czasem)
 add_library(interpreter STATIC
         interpreter.h
         interpreter.cpp
+        context.h
+        context.cpp
         )
 
 target_include_directories(interpreter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

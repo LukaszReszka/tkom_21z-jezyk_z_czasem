@@ -1,0 +1,3 @@
+/home/lukasz/Pulpit/TKOM/Jezyk_z_czasem/src/interpreter/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/lukasz/Pulpit/TKOM/Jezyk_z_czasem/src/interpreter/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/lukasz/Pulpit/TKOM/Jezyk_z_czasem/src/interpreter/cmake-build-debug/CMakeFiles/interpreter.dir

@@ -29,7 +29,7 @@ namespace parser {
         return text_rep;
     }
 
-    void IfStatement::execute() {
+    void IfStatement::execute(std::shared_ptr<interpreter::Context> cont) {
 
     }
 }

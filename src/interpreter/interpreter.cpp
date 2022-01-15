@@ -14,4 +14,13 @@ namespace interpreter {
             //TODO wyświetlenie komunikatu błędu gramatycznego lub leksykalnego
         }
     }
+
+    void Interpreter::execudeProgram() {
+        try {
+            programTree->execute();
+        } catch (std::runtime_error &e) {
+            std::cout << "Wyjątek semantyczny!!!\n";
+            //TODO wyświetlenie komunikatu błędu semantycznego
+        }
+    }
 }

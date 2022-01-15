@@ -25,7 +25,7 @@ namespace parser {
         return text_rep;
     }
 
-    void ElifStat::execute() {
+    void ElifStat::execute(std::shared_ptr<interpreter::Context> cont) {
 
     }
 }

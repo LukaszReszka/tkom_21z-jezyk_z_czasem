@@ -7,13 +7,15 @@
 namespace parser {
     class ProgramTree : public Phrase {
     public:
+        ProgramTree() { context = std::make_shared<interpreter::Context>(); }
+
         inline void addCommand(std::unique_ptr<Command> command) {
             commands.push_back(std::move(command));
         }
 
         std::string toString(int depth = 0) override;
 
-        virtual void execute() override;
+        void execute(std::shared_ptr<interpreter::Context> cont = nullptr) override;
 
     private:
         std::vector<std::unique_ptr<Command>> commands;

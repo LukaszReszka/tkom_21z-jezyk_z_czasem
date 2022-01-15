@@ -25,7 +25,7 @@ namespace parser {
         return text_rep;
     }
 
-    void WhileLoop::execute() {
+    void WhileLoop::execute(std::shared_ptr<interpreter::Context> cont) {
 
     }
 }
