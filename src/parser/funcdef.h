@@ -12,7 +12,6 @@ namespace parser {
 
         void execute() override;
 
-    private:
         std::string func_name;
         std::vector<std::string> params;
         std::vector<std::unique_ptr<Phrase>> func_body;

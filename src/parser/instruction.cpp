@@ -17,6 +17,9 @@ namespace parser {
     }
 
     void Instruction::execute() {
-
+        if (std::holds_alternative<std::unique_ptr<Phrase>>(instruction))
+            std::get<std::unique_ptr<Phrase>>(instruction)->execute();
+        else
+            std::get<std::unique_ptr<Expression>>(instruction)->evaluate();
     }
 }
