@@ -28,7 +28,7 @@ namespace parser {
         return text_rep;
     }
 
-    void FuncDef::execute(std::shared_ptr<interpreter::Context> cont) {
+    void FuncDef::execute() {
 
     }
 }

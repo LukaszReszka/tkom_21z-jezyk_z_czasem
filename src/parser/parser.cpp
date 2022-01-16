@@ -9,7 +9,7 @@ namespace parser {
 
     unique_ptr<ProgramTree> Parser::parseProgram() {
         advance();
-        unique_ptr<ProgramTree> programTree(new ProgramTree());
+        unique_ptr<ProgramTree> programTree = std::make_unique<ProgramTree>(context);
         while (current_token.type != lexer::T_END) {
             programTree->addCommand(std::move(parseCommand()));
             advance();
@@ -19,9 +19,9 @@ namespace parser {
 
     unique_ptr<Command> Parser::parseCommand() {
         if (current_token.type == lexer::T_FUNC)
-            return std::make_unique<Command>(std::move(parseFuncDef()));
+            return std::make_unique<Command>(std::move(parseFuncDef()), context);
         else
-            return std::make_unique<Command>(std::move(parseInstruction()));
+            return std::make_unique<Command>(std::move(parseInstruction()), context);
     }
 
     unique_ptr<FuncDef> Parser::parseFuncDef() {
@@ -111,11 +111,11 @@ namespace parser {
         OperatorType t = OperatorType::ASSIGN;
         advance();
 
-        unique_ptr<Literal> var = unique_ptr<Literal>(new Literal());
+        unique_ptr<Literal> var = std::make_unique<Literal>(context);
         var->val->type = ValueType::VARIABLE;
         var->val->value_str = variable_name;
 
-        return std::make_unique<OperatorOperation>(t, std::move(var), std::move(parseArithmeticExpr()));
+        return std::make_unique<OperatorOperation>(t, std::move(var), std::move(parseArithmeticExpr()), context);
     }
 
     unique_ptr<ShowFunc> Parser::parseShowFunc() {
@@ -126,7 +126,7 @@ namespace parser {
         advance();
         vector<unique_ptr<Expression>> args;
         if (current_token.type == lexer::T_STRING) {
-            unique_ptr<Literal> str = unique_ptr<Literal>(new Literal());
+            unique_ptr<Literal> str = std::make_unique<Literal>(context);
             str->val->type = ValueType::STRING;
             str->val->value_str = std::get<std::string>(current_token.value);
             args.push_back(std::move(std::move(str)));
@@ -138,7 +138,7 @@ namespace parser {
         while (current_token.type == lexer::T_COMMA) {
             advance();
             if (current_token.type == lexer::T_STRING) {
-                unique_ptr<Literal> str = unique_ptr<Literal>(new Literal());
+                unique_ptr<Literal> str = std::make_unique<Literal>(context);
                 str->val->type = ValueType::STRING;
                 str->val->value_str = std::get<std::string>(current_token.value);
                 args.push_back(std::move(std::move(str)));
@@ -183,7 +183,7 @@ namespace parser {
         advance();
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
-        unique_ptr<Literal> cond = unique_ptr<Literal>(new Literal());
+        unique_ptr<Literal> cond = std::make_unique<Literal>(context);
         cond->val->type = ValueType::BOOL;
         cond->val->value.boolean = true;
         return std::make_unique<ElifStat>(std::move(cond), body);
@@ -230,7 +230,7 @@ namespace parser {
         advance();
         vector<string> args;
         parseFuncArgs(args);
-        return std::make_unique<FuncCall>(func_name, args);
+        return std::make_unique<FuncCall>(func_name, args, context);
     }
 
     unique_ptr<Expression> Parser::parseCondition() {
@@ -260,7 +260,7 @@ namespace parser {
                 op_type = OperatorType::AND;
             advance();
             return std::make_unique<OperatorOperation>(op_type, std::move(first_operand),
-                                                       std::move(parseLogicalExpr()));
+                                                       std::move(parseLogicalExpr()), context);
         }
 
         return first_operand;
@@ -287,7 +287,8 @@ namespace parser {
         }
         advance();
 
-        return std::make_unique<OperatorOperation>(op_type, std::move(first_operand), std::move(parseArithmeticExpr()));
+        return std::make_unique<OperatorOperation>(op_type, std::move(first_operand), std::move(parseArithmeticExpr()),
+                                                   context);
     }
 
     unique_ptr<Expression> Parser::parseArithmeticExpr() {
@@ -303,7 +304,7 @@ namespace parser {
                 op_type = OperatorType::MINUS;
             advance();
             return std::make_unique<OperatorOperation>(op_type, std::move(first_operand),
-                                                       std::move(parseArithmeticExpr()));
+                                                       std::move(parseArithmeticExpr()), context);
         }
 
         return first_operand;
@@ -321,7 +322,7 @@ namespace parser {
                 op_type = OperatorType::DIVIDE;
             advance();
             return std::make_unique<OperatorOperation>(op_type, std::move(first_operand),
-                                                       std::move(parseMultiplicativeExpr()));
+                                                       std::move(parseMultiplicativeExpr()), context);
         }
 
         return first_operand;
@@ -330,7 +331,7 @@ namespace parser {
     unique_ptr<Expression> Parser::parseFactor() {
         if (current_token.type == lexer::T_MINUS) {
             advance();
-            return std::make_unique<OperatorOperation>(std::move(parseValue()));
+            return std::make_unique<OperatorOperation>(std::move(parseValue()), context);
         } else
             return parseValue();
     }
@@ -339,7 +340,7 @@ namespace parser {
         if (current_token.type == lexer::T_IDENTIFIER) {
             string variable_name;
             parseIdentifier(variable_name);
-            unique_ptr<Literal> var = unique_ptr<Literal>(new Literal());
+            unique_ptr<Literal> var = std::make_unique<Literal>(context);
             var->val->type = ValueType::VARIABLE;
             var->val->value_str = variable_name;
             return var;
@@ -359,13 +360,16 @@ namespace parser {
 
     unique_ptr<Expression> Parser::parseNumericAndTimeValue() {
         if (current_token.type == lexer::T_DATE) {
-            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::DATE);
+            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::DATE,
+                                             context);
         } else if (current_token.type == lexer::T_TIMESTAMP) {
-            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::TIMESTAMP);
+            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::TIMESTAMP,
+                                             context);
         } else if (current_token.type == lexer::T_CLOCK) {
-            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::CLOCK);
+            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::CLOCK,
+                                             context);
         } else if (current_token.type == lexer::T_TIME_PERIOD) {
-            unique_ptr<Literal> literal = unique_ptr<Literal>(new Literal());
+            unique_ptr<Literal> literal = std::make_unique<Literal>(context);
             literal->val->type = ValueType::TIME_PERIOD;
             literal->val->value.int_s = (std::get<lexer::TimePeriod>(current_token.value)).getSecNumb();
             return literal;
@@ -379,7 +383,7 @@ namespace parser {
     }
 
     unique_ptr<Expression> Parser::parseTimeUnit() {
-        unique_ptr<Literal> literal = unique_ptr<Literal>(new Literal());
+        unique_ptr<Literal> literal = std::make_unique<Literal>(context);
         if (current_token.type == lexer::T_HOUR_U) {
             advance();
             if (current_token.type == lexer::T_INT) {
@@ -419,7 +423,7 @@ namespace parser {
     }
 
     unique_ptr<Expression> Parser::parseNumb() {
-        unique_ptr<Literal> literal = unique_ptr<Literal>(new Literal());
+        unique_ptr<Literal> literal = std::make_unique<Literal>(context);
         if (current_token.type == lexer::T_INT) {
             literal->val->type = ValueType::INT;
             literal->val->value.integer_numb = std::get<int>(current_token.value);

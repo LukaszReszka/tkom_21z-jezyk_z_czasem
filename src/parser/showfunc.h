@@ -12,7 +12,7 @@ namespace parser {
 
         std::string toString(int depth) override;
 
-        void execute(std::shared_ptr<interpreter::Context> cont) override;
+        void execute() override;
 
     private:
 

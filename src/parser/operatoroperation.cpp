@@ -1,13 +1,15 @@
 #include <memory>
+#include <utility>
 #include "operatoroperation.h"
 
 namespace parser {
     OperatorOperation::OperatorOperation(OperatorType &t, std::unique_ptr<Expression> first_op,
-                                         std::unique_ptr<Expression> second_op) :
-            type(t), first_operand(std::move(first_op)), second_operand(std::move(second_op)) {}
+                                         std::unique_ptr<Expression> second_op, std::shared_ptr<interpreter::Context> c)
+            : type(t), first_operand(std::move(first_op)), second_operand(std::move(second_op)),
+              context(std::move(c)) {}
 
-    OperatorOperation::OperatorOperation(std::unique_ptr<Expression> op) : type(UNARY_MINUS),
-                                                                           first_operand(std::move(op)) {}
+    OperatorOperation::OperatorOperation(std::unique_ptr<Expression> op, std::shared_ptr<interpreter::Context> c)
+            : type(UNARY_MINUS), first_operand(std::move(op)), context(std::move(c)) {}
 
     std::string OperatorOperation::toString(int depth) {
         std::string hyphens;
@@ -51,7 +53,7 @@ namespace parser {
         return text_rep;
     }
 
-    std::unique_ptr<Value> OperatorOperation::evaluate(std::shared_ptr<interpreter::Context> cont) {
+    std::unique_ptr<Value> OperatorOperation::evaluate() {
         return std::unique_ptr<Value>();
     }
 }

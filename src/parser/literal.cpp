@@ -1,8 +1,15 @@
 #include "literal.h"
 
+#include <utility>
+
 namespace parser {
 
-    Literal::Literal(lexer::TimeMoment &tm, ValueType type) {
+    Literal::Literal(std::shared_ptr<interpreter::Context> c) : context(std::move(c)) {
+        val = std::make_unique<Value>();
+    }
+
+    Literal::Literal(lexer::TimeMoment &tm, ValueType type, std::shared_ptr<interpreter::Context> c) : context(
+            std::move(c)) {
         val = std::make_unique<Value>();
         val->type = type;
         val->timeMoment = tm;
@@ -56,7 +63,7 @@ namespace parser {
         return text_repr + "\n";
     }
 
-    std::unique_ptr<Value> Literal::evaluate(std::shared_ptr<interpreter::Context> cont) {
+    std::unique_ptr<Value> Literal::evaluate() {
         return std::unique_ptr<Value>();
     }
 }

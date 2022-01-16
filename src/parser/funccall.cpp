@@ -1,8 +1,10 @@
 #include <memory>
+#include <utility>
 #include "funccall.h"
 
 namespace parser {
-    FuncCall::FuncCall(std::string &f_name, std::vector<std::string> &args) : func_name(f_name), args(args) {}
+    FuncCall::FuncCall(std::string &f_name, std::vector<std::string> &args, std::shared_ptr<interpreter::Context> c) :
+            func_name(f_name), args(args), context(std::move(c)) {}
 
     std::string FuncCall::toString(int depth) {
         std::string hyphens;
@@ -19,7 +21,7 @@ namespace parser {
         return text_rep;
     }
 
-    std::unique_ptr<Value> FuncCall::evaluate(std::shared_ptr<interpreter::Context> cont) {
+    std::unique_ptr<Value> FuncCall::evaluate() {
         return std::unique_ptr<Value>();
     }
 }

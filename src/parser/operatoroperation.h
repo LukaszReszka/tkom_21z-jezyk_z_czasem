@@ -2,6 +2,7 @@
 #define JEZYK_Z_CZASEM_OPERATOROPERATION_H
 
 #include "expression.h"
+#include "../interpreter/context.h"
 
 namespace parser {
     enum OperatorType {
@@ -16,17 +17,18 @@ namespace parser {
     public:
 
         OperatorOperation(OperatorType &t, std::unique_ptr<Expression> first_op,
-                          std::unique_ptr<Expression> second_op);
+                          std::unique_ptr<Expression> second_op, std::shared_ptr<interpreter::Context> c);
 
-        explicit OperatorOperation(std::unique_ptr<Expression> op);
+        explicit OperatorOperation(std::unique_ptr<Expression> op, std::shared_ptr<interpreter::Context> c);
 
         std::string toString(int depth) override;
 
-        std::unique_ptr<Value> evaluate(std::shared_ptr<interpreter::Context> cont) override;
+        std::unique_ptr<Value> evaluate() override;
 
     private:
         OperatorType type;
         std::unique_ptr<Expression> first_operand, second_operand;
+        std::shared_ptr<interpreter::Context> context;
     };
 
 }

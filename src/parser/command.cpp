@@ -1,10 +1,17 @@
 #include <string>
+#include <utility>
 #include "command.h"
 
 namespace parser {
-    Command::Command(std::unique_ptr<FuncDef> fd) : type(FUNC_DEF), phrase(std::move(fd)) {}
+    Command::Command(std::unique_ptr<FuncDef> fd, std::shared_ptr<interpreter::Context> c) : type(FUNC_DEF),
+                                                                                             phrase(std::move(fd)),
+                                                                                             context(std::move(c)) {}
 
-    Command::Command(std::unique_ptr<Instruction> instr) : type(INSTRUCTION), phrase(std::move(instr)) {}
+    Command::Command(std::unique_ptr<Instruction> instr, std::shared_ptr<interpreter::Context> c) : type(INSTRUCTION),
+                                                                                                    phrase(std::move(
+                                                                                                            instr)),
+                                                                                                    context(std::move(
+                                                                                                            c)) {}
 
     std::string Command::toString(int depth) {
         std::string text_rep;
@@ -15,9 +22,9 @@ namespace parser {
         return text_rep;
     }
 
-    void Command::execute(std::shared_ptr<interpreter::Context> cont) {
+    void Command::execute() {
         if (type == INSTRUCTION)
-            std::get<std::unique_ptr<Instruction>>(phrase)->execute(cont);
+            std::get<std::unique_ptr<Instruction>>(phrase)->execute();
         else {
 
         }

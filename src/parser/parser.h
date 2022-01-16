@@ -2,12 +2,14 @@
 #define JEZYK_Z_CZASEM_PARSER_H
 
 #include "../lexer/lexer.h"
+#include "../interpreter/context.h"
 #include "programtree.h"
 #include "ifstatement.h"
 #include "operatoroperation.h"
 #include <memory>
+#include <utility>
 
-using std::unique_ptr;
+using std::unique_ptr, std::shared_ptr;
 using std::string;
 using std::vector;
 
@@ -15,13 +17,15 @@ namespace parser {
 
     class Parser {
     public:
-        explicit Parser(lexer::Lexer &lex) : token_source(lex) {}
+        explicit Parser(lexer::Lexer &lex, shared_ptr<interpreter::Context> c) : token_source(lex),
+                                                                                 context(std::move(c)) {}
 
         unique_ptr<ProgramTree> parseProgram();
 
     private:
         lexer::Lexer token_source;
         lexer::Token current_token;
+        shared_ptr<interpreter::Context> context;
 
         inline void advance() {
             current_token = current_token.type == lexer::T_END ? current_token

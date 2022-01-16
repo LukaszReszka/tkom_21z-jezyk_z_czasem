@@ -4,6 +4,7 @@
 #include <memory>
 #include <iostream>
 #include "../parser/parser.h"
+#include "context.h"
 
 namespace interpreter {
     class Interpreter {
@@ -11,12 +12,14 @@ namespace interpreter {
 
         explicit Interpreter(std::istream &input);
 
-        inline void showProgramTree() { std::cout << programTree->toString(); }
+        inline void showProgramTree() { std::cout << programTree->toString(0); }
 
         void execudeProgram();
 
     private:
+        bool hasErrorOccurred = false, hasExecutionFinished = false;
         std::unique_ptr<parser::ProgramTree> programTree;
+        std::shared_ptr<Context> execute_context;
     };
 }
 

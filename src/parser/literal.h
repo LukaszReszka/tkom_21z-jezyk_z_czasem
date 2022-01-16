@@ -2,6 +2,7 @@
 #define JEZYK_Z_CZASEM_LITERAL_H
 
 #include "expression.h"
+#include "../interpreter/context.h"
 #include <string>
 #include <memory>
 #include <chrono>
@@ -13,15 +14,18 @@ namespace parser {
     class Literal : public Expression {
     public:
 
-        Literal() { val = std::make_unique<Value>(); }
+        explicit Literal(std::shared_ptr<interpreter::Context> c);
 
-        Literal(lexer::TimeMoment &tm, ValueType type);
+        Literal(lexer::TimeMoment &tm, ValueType type, std::shared_ptr<interpreter::Context> c);
 
         std::string toString(int depth) override;
 
-        std::unique_ptr<Value> evaluate(std::shared_ptr<interpreter::Context> cont) override;
+        std::unique_ptr<Value> evaluate() override;
 
         std::unique_ptr<Value> val;
+
+    private:
+        std::shared_ptr<interpreter::Context> context;
     };
 }
 

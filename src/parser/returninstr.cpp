@@ -13,7 +13,7 @@ namespace parser {
         return text_rep;
     }
 
-    void ReturnInstr::execute(std::shared_ptr<interpreter::Context> cont) {
+    void ReturnInstr::execute() {
 
     }
 }
