@@ -8,9 +8,9 @@ std::string getTree(const std::string &code) {
     std::stringstream code_to_test(code);
     code_source::CodeSource source(code_to_test);
     lexer::Lexer lexer(source);
-    parser::Parser parser(lexer);
+    parser::Parser parser(lexer, nullptr);
     unique_ptr<parser::ProgramTree> tree = std::move(parser.parseProgram());
-    return tree->toString();
+    return tree->toString(0);
 }
 
 std::string code, right_tree;
