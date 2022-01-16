@@ -5,8 +5,8 @@
 
 namespace parser {
 
-    ElifStat::ElifStat(std::unique_ptr<Expression> cond, std::vector<std::unique_ptr<Phrase>> &body) : cond(
-            std::move(cond)) {
+    ElifStat::ElifStat(std::unique_ptr<Expression> cond, std::vector<std::unique_ptr<Phrase>> &body,
+                       std::shared_ptr<interpreter::Context> c) : cond(std::move(cond)), context(std::move(c)) {
         for (auto &i: body)
             this->body.push_back(std::move(i));
     }

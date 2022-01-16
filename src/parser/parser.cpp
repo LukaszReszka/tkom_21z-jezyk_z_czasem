@@ -88,7 +88,7 @@ namespace parser {
             elifs.push_back(std::move(parseElse()));
         }
 
-        return std::make_unique<IfStatement>(std::move(cond), body, elifs);
+        return std::make_unique<IfStatement>(std::move(cond), body, elifs, context);
     }
 
     unique_ptr<WhileLoop> Parser::parseWhileLoop() {
@@ -97,7 +97,7 @@ namespace parser {
         advance();
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
-        return std::make_unique<WhileLoop>(std::move(cond), body);
+        return std::make_unique<WhileLoop>(std::move(cond), body, context);
     }
 
     unique_ptr<OperatorOperation> Parser::parseAssignOperator() {
@@ -176,7 +176,7 @@ namespace parser {
         advance();
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
-        return std::make_unique<ElifStat>(std::move(cond), body);
+        return std::make_unique<ElifStat>(std::move(cond), body, context);
     }
 
     unique_ptr<ElifStat> Parser::parseElse() {
@@ -186,7 +186,7 @@ namespace parser {
         unique_ptr<Literal> cond = std::make_unique<Literal>(context);
         cond->val->type = ValueType::BOOL;
         cond->val->value.boolean = true;
-        return std::make_unique<ElifStat>(std::move(cond), body);
+        return std::make_unique<ElifStat>(std::move(cond), body, context);
     }
 
     void Parser::parseIdentifier(string &ident) {
