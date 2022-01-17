@@ -21,49 +21,50 @@ namespace parser {
             text_repr += "-";
 
         if (val->type == INT) {
-            text_repr += "INT: " + std::to_string(val->value.integer_numb);
+            text_repr += "INT: ";
         } else if (val->type == DOUBLE) {
-            text_repr += "DOUBLE: " + std::to_string(val->value.double_numb);
+            text_repr += "DOUBLE: ";
         } else if (val->type == STRING) {
-            text_repr += "STRING: " + val->value_str;
+            text_repr += "STRING: ";
         } else if (val->type == BOOL) {
-            text_repr += "BOOL: " + std::to_string(val->value.boolean);
+            text_repr += "BOOL: ";
         } else if (val->type == VARIABLE) {
-            text_repr += "VARIABLE: " + val->value_str;
+            text_repr += "VARIABLE: ";
         } else if (val->type == TIME_PERIOD) {
-            text_repr += "TIME_PERIOD[s]: " + std::to_string(val->value.int_s.count());
+            text_repr += "TIME_PERIOD[s]: ";
         } else if (val->type == DATE) {
-            lexer::TimeMoment tm = val->timeMoment;
-            text_repr += "DATE: " + std::to_string(tm.getDay()) + "/" + std::to_string(tm.getMonth()) + "/" +
-                         std::to_string(tm.getYear());
+            text_repr += "DATE: ";
         } else if (val->type == TIMESTAMP) {
-            lexer::TimeMoment tm = val->timeMoment;
-            text_repr += "TIMESTAMP: " + std::to_string(tm.getDay()) + "/" + std::to_string(tm.getMonth()) + "/" +
-                         std::to_string(tm.getYear()) + " " + std::to_string(tm.getHour()) + ":" +
-                         std::to_string(tm.getMin()) + ":" +
-                         std::to_string(tm.getSec());
+            text_repr += "TIMESTAMP: ";
         } else if (val->type == CLOCK) {
-            lexer::TimeMoment tm = val->timeMoment;
-            text_repr += "CLOCK: " + std::to_string(tm.getHour()) + ":" + std::to_string(tm.getMin()) + ":" +
-                         std::to_string(tm.getSec());
+            text_repr += "CLOCK: ";
         } else if (val->type == INT_S) {
-            text_repr += "SECONDS(int): " + std::to_string(val->value.int_s.count());
+            text_repr += "SECONDS(int): ";
         } else if (val->type == INT_MIN) {
-            text_repr += "MINUTES(int): " + std::to_string(val->value.int_min.count());
+            text_repr += "MINUTES(int): ";
         } else if (val->type == INT_H) {
-            text_repr += "HOURS(int): " + std::to_string(val->value.int_h.count());
+            text_repr += "HOURS(int): ";
         } else if (val->type == DOUBLE_S) {
-            text_repr += "SECONDS(double): " + std::to_string(val->value.double_s.count());
+            text_repr += "SECONDS(double): ";
         } else if (val->type == DOUBLE_MIN) {
-            text_repr += "MINUTES(double): " + std::to_string(val->value.double_min.count());
+            text_repr += "MINUTES(double): ";
         } else if (val->type == DOUBLE_H) {
-            text_repr += "HOURS(double): " + std::to_string(val->value.double_h.count());
+            text_repr += "HOURS(double): ";
         }
-
+        text_repr += val->toString();
         return text_repr + "\n";
     }
 
-    std::unique_ptr<Value> Literal::evaluate() {
-        return std::unique_ptr<Value>();
+    std::shared_ptr<Value> Literal::evaluate() {
+        if (val->type != VARIABLE)
+            return std::move(val);
+
+        bool foundVarVal = false;
+        std::shared_ptr<Value> v = context->getVariableValue(val->value_str, foundVarVal);
+
+        if (!foundVarVal)
+            throw std::runtime_error("Nie znaleziono wartości zmiennej " + val->value_str);
+
+        return v;
     }
 }

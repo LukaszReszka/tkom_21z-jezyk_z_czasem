@@ -23,12 +23,16 @@ namespace parser {
 
         std::string toString(int depth) override;
 
-        std::unique_ptr<Value> evaluate() override;
+        std::shared_ptr<Value> evaluate() override;
 
     private:
         OperatorType type;
         std::unique_ptr<Expression> first_operand, second_operand;
         std::shared_ptr<interpreter::Context> context;
+
+        std::shared_ptr<Value> addition(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+
+        void assign(const std::shared_ptr<Value> &val1, std::shared_ptr<Value> val2);
     };
 
 }

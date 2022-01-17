@@ -18,6 +18,10 @@ namespace interpreter {
             func_scope.back().addVariableToScope(name, std::move(value));
         }
 
+        inline void addVariable(std::string &name, std::shared_ptr<Value> value) {
+            func_scope.back().addVariableToScope(name, std::move(value));
+        }
+
         std::shared_ptr<Value> getVariableValue(std::string &var_name, bool &foundVariable);
 
     private:

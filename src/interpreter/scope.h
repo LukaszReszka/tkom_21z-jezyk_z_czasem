@@ -12,6 +12,8 @@ namespace interpreter {
 
         void addVariableToScope(std::string &name, std::unique_ptr<Value> value);
 
+        void addVariableToScope(std::string &name, std::shared_ptr<Value> value);
+
         std::shared_ptr<Value> getVariableValue(std::string &var_name, bool &foundVariable);
 
     private:

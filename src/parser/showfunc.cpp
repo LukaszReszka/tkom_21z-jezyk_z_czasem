@@ -1,6 +1,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <iostream>
 #include "showfunc.h"
 
 namespace parser {
@@ -23,6 +24,12 @@ namespace parser {
     }
 
     void ShowFunc::execute() {
+        std::string str_to_show;
+        for (auto &arg: args) {
+            std::shared_ptr<Value> val = arg->evaluate();
+            str_to_show += val->toString();
+        }
 
+        std::cout << str_to_show;
     }
 }

@@ -10,7 +10,7 @@ namespace parser {
 
         virtual std::string toString(int depth) = 0;
 
-        virtual std::unique_ptr<Value> evaluate() = 0;
+        virtual std::shared_ptr<Value> evaluate() = 0;
     };
 }
 

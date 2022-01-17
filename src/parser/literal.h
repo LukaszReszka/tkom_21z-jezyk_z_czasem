@@ -20,7 +20,7 @@ namespace parser {
 
         std::string toString(int depth) override;
 
-        std::unique_ptr<Value> evaluate() override;
+        std::shared_ptr<Value> evaluate() override;
 
         std::unique_ptr<Value> val;
 

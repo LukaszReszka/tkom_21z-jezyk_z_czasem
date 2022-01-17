@@ -25,7 +25,13 @@ namespace interpreter {
 
         void removeScope();
 
+        void addFunCallContext();
+
+        void removeFunCallContext();
+
         void addVariable(std::string &name, std::unique_ptr<Value> value);
+
+        void addVariable(std::string &name, std::shared_ptr<Value> value);
 
         std::shared_ptr<Value> getVariableValue(std::string &var_name, bool &foundVariable);
 

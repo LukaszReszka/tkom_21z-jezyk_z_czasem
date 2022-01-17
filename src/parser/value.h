@@ -17,7 +17,7 @@ namespace parser {
         VARIABLE
     };
 
-    struct Value {
+    class Value {
     public:
 
         ValueType type;
@@ -36,6 +36,8 @@ namespace parser {
 
         std::string value_str;
         lexer::TimeMoment timeMoment;
+
+        std::string toString();
     };
 }
 

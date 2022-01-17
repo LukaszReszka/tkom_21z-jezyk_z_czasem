@@ -53,7 +53,46 @@ namespace parser {
         return text_rep;
     }
 
-    std::unique_ptr<Value> OperatorOperation::evaluate() {
-        return std::unique_ptr<Value>();
+    std::shared_ptr<Value> OperatorOperation::evaluate() {
+        std::shared_ptr<Value> left_value = first_operand->evaluate();
+        std::shared_ptr<Value> right_value;
+        if (type != UNARY_MINUS)
+            right_value = second_operand->evaluate();
+
+        if (type == ASSIGN) {
+            assign(right_value, left_value);
+        } else if (type == PLUS)
+            return addition(left_value, right_value);
+        //else if (type == MINUS)
+        //    return subtraction(left_value, right_value);
+        //else if (type == MULTIPLY)
+        //    return multiplication(left_value, right_value);
+        //else
+        // ...
+
+        return {};
     }
+
+    std::shared_ptr<Value> OperatorOperation::addition(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
+        std::shared_ptr<Value> returned_val;
+        if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
+            returned_val->type = ValueType::INT;
+            returned_val->value.integer_numb = val1->value.integer_numb + val2->value.integer_numb;
+        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::INT_H;
+            returned_val->value.int_h = val1->value.int_h + val2->value.int_h;
+        }
+            //else if ...
+        else
+            throw std::runtime_error("Cannot use addition with specified operands\n");
+        return returned_val;
+    }
+
+    void OperatorOperation::assign(const std::shared_ptr<Value> &val1, std::shared_ptr<Value> val2) {
+        if (val1->type != ValueType::VARIABLE)
+            throw std::runtime_error("Cannot assign value to non-variable\n");
+
+        context->addVariable(val1->value_str, std::move(val2));
+    }
+
 }

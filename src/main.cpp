@@ -8,10 +8,12 @@
 int main() {
 //    interpreter::Interpreter interpreter(std::cin);
 //    interpreter.showProgramTree();
+//    interpreter.execudeProgram();
 
-    string code = "a = 4";
+    string code = "SHOW(4)";
     std::stringstream code_to_test(code);
     interpreter::Interpreter interpreter(code_to_test);
     interpreter.showProgramTree();
+    interpreter.execudeProgram();
     return 0;
 }

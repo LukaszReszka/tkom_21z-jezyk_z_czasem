@@ -36,6 +36,6 @@ add_library(parser STATIC
         ../interpreter/funcallcontext.cpp
         ../interpreter/funcallcontext.h
         ../interpreter/scope.cpp
-        ../interpreter/scope.h)
+        ../interpreter/scope.h value.cpp)
 
 target_include_directories(parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
