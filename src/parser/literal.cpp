@@ -63,7 +63,7 @@ namespace parser {
         std::shared_ptr<Value> v = context->getVariableValue(val->value_str, foundVarVal);
 
         if (!foundVarVal)
-            throw std::runtime_error("Nie znaleziono wartości zmiennej " + val->value_str);
+            throw std::runtime_error("Not found variable " + val->value_str);
 
         return v;
     }

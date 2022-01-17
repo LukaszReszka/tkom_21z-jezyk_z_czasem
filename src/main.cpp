@@ -10,10 +10,10 @@ int main() {
 //    interpreter.showProgramTree();
 //    interpreter.execudeProgram();
 
-    string code = "SHOW(a)";
+    string code = "SHOW(\"Ala ma lat \", 4)";
     std::stringstream code_to_test(code);
     interpreter::Interpreter interpreter(code_to_test);
-//    interpreter.showProgramTree();
-    //interpreter.execudeProgram();
+    interpreter.showProgramTree();
+    interpreter.execudeProgram();
     return 0;
 }

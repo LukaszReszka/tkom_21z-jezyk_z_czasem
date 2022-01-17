@@ -60,7 +60,7 @@ namespace parser {
             right_value = second_operand->evaluate();
 
         if (type == ASSIGN) {
-            assign(right_value, left_value);
+            assign(left_value, right_value);
         } else if (type == PLUS)
             return addition(left_value, right_value);
         //else if (type == MINUS)
