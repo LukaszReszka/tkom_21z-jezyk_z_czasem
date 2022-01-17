@@ -13,8 +13,7 @@ namespace interpreter {
                 programTree = std::move(parser.parseProgram());
             } catch (std::runtime_error &e) {
                 hasErrorOccurred = true;
-                std::cout << "Wyjątek!!!\n";
-                //TODO wyświetlenie komunikatu błędu gramatycznego lub leksykalnego
+                std::cout << e.what();
             }
         }
     }
@@ -26,8 +25,7 @@ namespace interpreter {
                 hasExecutionFinished = true;
             } catch (std::runtime_error &e) {
                 hasErrorOccurred = true;
-                std::cout << "Wyjątek semantyczny!!!\n";
-                //TODO wyświetlenie komunikatu błędu semantycznego
+                std::cout << e.what();
             }
         }
     }
