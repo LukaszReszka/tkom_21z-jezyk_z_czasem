@@ -38,6 +38,8 @@ namespace parser {
         lexer::TimeMoment timeMoment;
 
         std::string toString();
+
+        std::string timeMomentToString();
     };
 }
 

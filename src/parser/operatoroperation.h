@@ -32,6 +32,8 @@ namespace parser {
 
         std::shared_ptr<Value> addition(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
 
+        std::shared_ptr<Value> negation(std::shared_ptr<Value> val1);
+
         void assign(const std::shared_ptr<Value> &val1, std::shared_ptr<Value> val2);
     };
 

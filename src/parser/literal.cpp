@@ -1,5 +1,5 @@
 #include "literal.h"
-
+#include "tln_exception.h"
 #include <utility>
 
 namespace parser {
@@ -63,7 +63,7 @@ namespace parser {
         std::shared_ptr<Value> v = context->getVariableValue(val->value_str, foundVarVal);
 
         if (!foundVarVal)
-            throw std::runtime_error("Not found variable " + val->value_str);
+            throw tln_exception("Not found variable " + val->value_str);
 
         return v;
     }

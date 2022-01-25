@@ -32,9 +32,9 @@ TEST_CASE("Function call") {
                      "-Function Call\n"
                      "--Name: anotherFunc\n"
                      "--Arguments:\n"
-                     "---a98\n"
-                     "---b_1\n"
-                     "---c\n";
+                     "---VARIABLE: a98\n"
+                     "---VARIABLE: b_1\n"
+                     "---VARIABLE: c\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -167,8 +167,8 @@ TEST_CASE("Assign operator") {
                      "---Function Call\n"
                      "----Name: func\n"
                      "----Arguments:\n"
-                     "-----arg1\n"
-                     "-----arg2\n";
+                     "-----VARIABLE: arg1\n"
+                     "-----VARIABLE: arg2\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -180,7 +180,7 @@ TEST_CASE("Assign operator") {
                      "--First Operand:\n"
                      "---VARIABLE: a\n"
                      "--Second Operand:\n"
-                     "---TIME_PERIOD[s]: 9054\n";
+                     "---TIME_PERIOD[s]: 9054s\n";
 
         CHECK_EQ(right_tree, getTree(code));
     }
@@ -230,7 +230,7 @@ TEST_CASE("Assign operator") {
                      "--Second Operand:\n"
                      "---Operator MULTIPLY\n"
                      "----First Operand:\n"
-                     "-----HOURS(int): 3\n"
+                     "-----HOURS(int): 3h\n"
                      "----Second Operand:\n"
                      "-----INT: 2\n";
 
@@ -246,7 +246,7 @@ TEST_CASE("Assign operator") {
                      "--Second Operand:\n"
                      "---Operator DIVIDE\n"
                      "----First Operand:\n"
-                     "-----MINUTES(int): 60\n"
+                     "-----MINUTES(int): 60m\n"
                      "----Second Operand:\n"
                      "-----INT: 2\n";
 

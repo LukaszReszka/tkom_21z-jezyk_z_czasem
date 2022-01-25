@@ -1,6 +1,6 @@
 #include "parser.h"
 #include "literal.h"
-
+#include "tln_exception.h"
 
 using std::chrono::seconds, std::chrono::minutes, std::chrono::hours;
 using std::ratio, std::chrono::duration;
@@ -10,10 +10,9 @@ namespace parser {
     unique_ptr<ProgramTree> Parser::parseProgram() {
         advance();
         unique_ptr<ProgramTree> programTree = std::make_unique<ProgramTree>(context);
-        while (current_token.type != lexer::T_END) {
+        while (current_token.type != lexer::T_END)
             programTree->addCommand(std::move(parseCommand()));
-            advance();
-        }
+
         return programTree;
     }
 
@@ -28,10 +27,8 @@ namespace parser {
         advance();
         string func_name;
         parseIdentifier(func_name);
-        advance();
         vector<string> func_args;
-        parseFuncArgs(func_args);
-        advance();
+        parseFuncParams(func_args);
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
         return std::make_unique<FuncDef>(func_name, func_args, body);
@@ -51,42 +48,36 @@ namespace parser {
             return std::make_unique<Instruction>(std::move(parseRet()));
         else if (current_token.type == lexer::T_SHOW)
             return std::make_unique<Instruction>(std::move(parseShowFunc()));
-        //else
-        //TODO error "Unrecognised instruction"
+        else
+            throw tln_exception("Unrecognised instruction");
     }
 
     unique_ptr<ReturnInstr> Parser::parseRet() {
         advance();
-        if (current_token.type != lexer::T_PARENTHESES_1) {
-            //TODO error "Lack of \"(\""
-        }
+        if (current_token.type != lexer::T_PARENTHESES_1)
+            throw tln_exception("Lack of \"(\"");
 
         advance();
         unique_ptr<Expression> ret_val = std::move(parseArithmeticExpr());
-        advance();
 
-        if (current_token.type != lexer::T_PARENTHESES_2) {
-            //TODO error "Lack of \")\""
-        }
+        if (current_token.type != lexer::T_PARENTHESES_2)
+            throw tln_exception("Lack of \")\"");
+
+        advance();
         return std::make_unique<ReturnInstr>(std::move(ret_val));
     }
 
     unique_ptr<IfStatement> Parser::parseIf() {
         advance();
         unique_ptr<Expression> cond = std::move(parseCondition());
-        advance();
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
-        advance();
         vector<unique_ptr<ElifStat>> elifs;
-        while (current_token.type == lexer::T_ELIF) {
+        while (current_token.type == lexer::T_ELIF)
             elifs.push_back(std::move(parseElif()));
-            advance();
-        }
 
-        if (current_token.type == lexer::T_ELSE) {
+        if (current_token.type == lexer::T_ELSE)
             elifs.push_back(std::move(parseElse()));
-        }
 
         return std::make_unique<IfStatement>(std::move(cond), body, elifs, context);
     }
@@ -94,7 +85,6 @@ namespace parser {
     unique_ptr<WhileLoop> Parser::parseWhileLoop() {
         advance();
         unique_ptr<Expression> cond = std::move(parseCondition());
-        advance();
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
         return std::make_unique<WhileLoop>(std::move(cond), body, context);
@@ -103,11 +93,10 @@ namespace parser {
     unique_ptr<OperatorOperation> Parser::parseAssignOperator() {
         string variable_name;
         parseIdentifier(variable_name);
-        advance();
 
-        if (current_token.type != lexer::T_ASSIGN) {
-            //TODO error "Wrong operator - expected \"=\""
-        }
+        if (current_token.type != lexer::T_ASSIGN)
+            throw tln_exception("Wrong operator - expected \"=\"");
+
         OperatorType t = OperatorType::ASSIGN;
         advance();
 
@@ -120,60 +109,29 @@ namespace parser {
 
     unique_ptr<ShowFunc> Parser::parseShowFunc() {
         advance();
-        if (current_token.type != lexer::T_PARENTHESES_1) {
-            //TODO error "Lack of \"(\""
-        }
-        advance();
         vector<unique_ptr<Expression>> args;
-        if (current_token.type == lexer::T_STRING) {
-            unique_ptr<Literal> str = std::make_unique<Literal>(context);
-            str->val->type = ValueType::STRING;
-            str->val->value_str = std::get<std::string>(current_token.value);
-            args.push_back(std::move(std::move(str)));
-        } else
-            args.push_back(std::move(parseArithmeticExpr()));
-
-        advance();
-
-        while (current_token.type == lexer::T_COMMA) {
-            advance();
-            if (current_token.type == lexer::T_STRING) {
-                unique_ptr<Literal> str = std::make_unique<Literal>(context);
-                str->val->type = ValueType::STRING;
-                str->val->value_str = std::get<std::string>(current_token.value);
-                args.push_back(std::move(std::move(str)));
-            } else
-                args.push_back(std::move(parseArithmeticExpr()));
-            advance();
-        }
-
-        if (current_token.type != lexer::T_PARENTHESES_2) {
-            //TODO error "Lack of \")\""
-        }
-
+        parseFuncArgs(args, false);
         return std::make_unique<ShowFunc>(args);
     }
 
     void Parser::parseInstructionsBlock(vector<unique_ptr<Phrase>> &instructs) {
-        if (current_token.type != lexer::T_BRACE_1) {
-            //TODO error "Lack of \"{\""
-        }
+        if (current_token.type != lexer::T_BRACE_1)
+            throw tln_exception("Lack of \"{\"");
+
         advance();
 
-        while (current_token.type != lexer::T_END && current_token.type != lexer::T_BRACE_2) {
+        while (current_token.type != lexer::T_END && current_token.type != lexer::T_BRACE_2)
             instructs.push_back(std::move(parseInstruction()));
-            advance();
-        }
 
-        if (current_token.type != lexer::T_BRACE_2) {
-            //TODO error "Lack of \"}\""
-        }
+        if (current_token.type != lexer::T_BRACE_2)
+            throw tln_exception("Lack of \"}\"");
+
+        advance();
     }
 
     unique_ptr<ElifStat> Parser::parseElif() {
         advance();
         unique_ptr<Expression> cond = std::move(parseCondition());
-        advance();
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
         return std::make_unique<ElifStat>(std::move(cond), body, context);
@@ -193,65 +151,96 @@ namespace parser {
         ident.clear();
         if (current_token.type == lexer::T_IDENTIFIER) {
             ident = std::get<std::string>(current_token.value);
-        }
-        //else
-        //TODO error "Expected identifier"
+        } else
+            throw tln_exception("Expected identifier");
+        advance();
     }
 
-    void Parser::parseFuncArgs(vector<string> &args) {
+    void Parser::parseFuncParams(vector<string> &args) {
         args.clear();
-        if (current_token.type != lexer::T_PARENTHESES_1) {
-            //TODO error "Lack of \"(\""
-        }
+        if (current_token.type != lexer::T_PARENTHESES_1)
+            throw tln_exception("Lack of \"(\"");
+
         advance();
 
         if (current_token.type == lexer::T_IDENTIFIER) {
             string ident;
             parseIdentifier(ident);
             args.push_back(ident);
-            advance();
             while (current_token.type == lexer::T_COMMA) {
                 advance();
                 parseIdentifier(ident);
                 args.push_back(ident);
-                advance();
             }
         }
 
-        if (current_token.type != lexer::T_PARENTHESES_2) {
-            //TODO error "Lack of \")\""
-        }
+        if (current_token.type != lexer::T_PARENTHESES_2)
+            throw tln_exception("Lack of \")\"");
+
+        advance();
     }
 
-    unique_ptr<FuncCall> Parser::parseFuncCall() {  //TODO jako argumenty tylko zmienne, bez wyrażeń ...
+    void Parser::parseFuncArgs(vector<unique_ptr<Expression>> &args, bool noneAllowed) {
+        if (current_token.type != lexer::T_PARENTHESES_1)
+            throw tln_exception("Lack of \"(\"");
+
+        advance();
+
+        if (noneAllowed && current_token.type == lexer::T_PARENTHESES_2) {
+            advance();
+            return;
+        }
+
+        parseSingleArg(args);
+
+        while (current_token.type == lexer::T_COMMA) {
+            advance();
+            parseSingleArg(args);
+        }
+
+        if (current_token.type != lexer::T_PARENTHESES_2)
+            throw tln_exception("Lack of \")\"");
+
+        advance();
+    }
+
+    void Parser::parseSingleArg(vector<unique_ptr<Expression>> &args) {
+        if (current_token.type == lexer::T_STRING) {
+            unique_ptr<Literal> str = std::make_unique<Literal>(context);
+            str->val->type = ValueType::STRING;
+            str->val->value_str = std::get<std::string>(current_token.value);
+            args.push_back(std::move(std::move(str)));
+            advance();
+        } else
+            args.push_back(std::move(parseArithmeticExpr()));
+    }
+
+    unique_ptr<FuncCall> Parser::parseFuncCall() {
         advance();
         string func_name;
         parseIdentifier(func_name);
-        advance();
-        vector<string> args;
+        vector<unique_ptr<Expression>> args;
         parseFuncArgs(args);
         return std::make_unique<FuncCall>(func_name, args, context);
     }
 
     unique_ptr<Expression> Parser::parseCondition() {
-        if (current_token.type != lexer::T_PARENTHESES_1) {
-            //TODO error "Lack of \"(\""
-        }
+        if (current_token.type != lexer::T_PARENTHESES_1)
+            throw tln_exception("Lack of \"(\"");
 
         advance();
         unique_ptr<Expression> cond = std::move(parseLogicalExpr());
+
+        if (current_token.type != lexer::T_PARENTHESES_2)
+            throw tln_exception("Lack of \")\"");
+
         advance();
-
-        if (current_token.type != lexer::T_PARENTHESES_2) {
-            //TODO error "Lack of \")\""
-        }
-
         return cond;
     }
 
     unique_ptr<Expression> Parser::parseLogicalExpr() {
         unique_ptr<Expression> first_operand = std::move(parseComparisonExpr());
-        advance();
+
         if (current_token.type == lexer::T_OR || current_token.type == lexer::T_AND) {
             OperatorType op_type;
             if (current_token.type == lexer::T_OR)
@@ -268,7 +257,7 @@ namespace parser {
 
     unique_ptr<Expression> Parser::parseComparisonExpr() {
         unique_ptr<Expression> first_operand = std::move(parseArithmeticExpr());
-        advance();
+
         OperatorType op_type;
         if (current_token.type == lexer::T_EQUAL)
             op_type = OperatorType::EQUAL;
@@ -282,9 +271,9 @@ namespace parser {
             op_type = OperatorType::LESS;
         else if (current_token.type == lexer::T_LESS_E)
             op_type = OperatorType::LESS_EQUAL;
-        else {
-            //TODO error "Wrong operator - expected comparison operator"
-        }
+        else
+            throw tln_exception("Wrong operator - expected comparison operator");
+
         advance();
 
         return std::make_unique<OperatorOperation>(op_type, std::move(first_operand), std::move(parseArithmeticExpr()),
@@ -293,10 +282,8 @@ namespace parser {
 
     unique_ptr<Expression> Parser::parseArithmeticExpr() {
         unique_ptr<Expression> first_operand = std::move(parseMultiplicativeExpr());
-        advance();
 
         if (current_token.type == lexer::T_PLUS || current_token.type == lexer::T_MINUS) {
-
             OperatorType op_type;
             if (current_token.type == lexer::T_PLUS)
                 op_type = OperatorType::PLUS;
@@ -312,7 +299,6 @@ namespace parser {
 
     unique_ptr<Expression> Parser::parseMultiplicativeExpr() {
         unique_ptr<Expression> first_operand = std::move(parseFactor());
-        advance();
 
         if (current_token.type == lexer::T_MULTIPLY || current_token.type == lexer::T_DIVIDE) {
             OperatorType op_type;
@@ -349,88 +335,95 @@ namespace parser {
         } else if (current_token.type == lexer::T_PARENTHESES_1) {
             advance();
             unique_ptr<Expression> arthm = std::move(parseArithmeticExpr());
+            if (current_token.type != lexer::T_PARENTHESES_2)
+                throw tln_exception("Lack of \")\"");
             advance();
-            if (current_token.type != lexer::T_PARENTHESES_2) {
-                //TODO error "Lack of \")\""
-            }
             return arthm;
         } else
             return std::move(parseNumericAndTimeValue());
     }
 
     unique_ptr<Expression> Parser::parseNumericAndTimeValue() {
+        unique_ptr<Literal> literal;
         if (current_token.type == lexer::T_DATE) {
-            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::DATE,
-                                             context);
+            literal = std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::DATE,
+                                                context);
         } else if (current_token.type == lexer::T_TIMESTAMP) {
-            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::TIMESTAMP,
-                                             context);
+            literal = std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::TIMESTAMP,
+                                                context);
         } else if (current_token.type == lexer::T_CLOCK) {
-            return std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::CLOCK,
-                                             context);
+            literal = std::make_unique<Literal>(std::get<lexer::TimeMoment>(current_token.value), ValueType::CLOCK,
+                                                context);
         } else if (current_token.type == lexer::T_TIME_PERIOD) {
-            unique_ptr<Literal> literal = std::make_unique<Literal>(context);
+            literal = std::make_unique<Literal>(context);
             literal->val->type = ValueType::TIME_PERIOD;
             literal->val->value.int_s = (std::get<lexer::TimePeriod>(current_token.value)).getSecNumb();
-            return literal;
         } else if (current_token.type == lexer::T_INT || current_token.type == lexer::T_DOUBLE) {
             return std::move(parseNumb());
         } else if (current_token.type == lexer::T_HOUR_U || current_token.type == lexer::T_MIN_U ||
                    current_token.type == lexer::T_SEC_U) {
             return std::move(parseTimeUnit());
-        } //else
-        //TODO error "Expected number, time moment or time period"
+        } else
+            throw tln_exception("Expected number, time moment or time period");
+
+        advance();
+        return literal;
     }
 
     unique_ptr<Expression> Parser::parseTimeUnit() {
         unique_ptr<Literal> literal = std::make_unique<Literal>(context);
+
         if (current_token.type == lexer::T_HOUR_U) {
             advance();
             if (current_token.type == lexer::T_INT) {
                 literal->val->type = ValueType::INT_H;
                 literal->val->value.int_h = hours(std::get<int>(current_token.value));
-                return literal;
             } else if (current_token.type == lexer::T_DOUBLE) {
                 literal->val->type = ValueType::DOUBLE_H;
                 literal->val->value.double_h = duration<double, ratio<3600>>(std::get<double>(current_token.value));
-                return literal;
-            }
+            } else
+                throw tln_exception("Expected int or double");
+
         } else if (current_token.type == lexer::T_MIN_U) {
             advance();
             if (current_token.type == lexer::T_INT) {
                 literal->val->type = ValueType::INT_MIN;
                 literal->val->value.int_min = minutes(std::get<int>(current_token.value));
-                return literal;
             } else if (current_token.type == lexer::T_DOUBLE) {
                 literal->val->type = ValueType::DOUBLE_MIN;
                 literal->val->value.double_min = duration<double, ratio<60>>(std::get<double>(current_token.value));
-                return literal;
-            }
+            } else
+                throw tln_exception("Expected int or double");
+
         } else if (current_token.type == lexer::T_SEC_U) {
             advance();
             if (current_token.type == lexer::T_INT) {
                 literal->val->type = ValueType::INT_S;
                 literal->val->value.int_s = seconds(std::get<int>(current_token.value));
-                return literal;
             } else if (current_token.type == lexer::T_DOUBLE) {
                 literal->val->type = ValueType::DOUBLE_S;
                 literal->val->value.double_s = duration<double>(std::get<double>(current_token.value));
-                return literal;
-            }
+            } else
+                throw tln_exception("Expected int or double");
         }
 
-        //TODO error Expected int or double
+        advance();
+        return literal;
     }
 
     unique_ptr<Expression> Parser::parseNumb() {
         unique_ptr<Literal> literal = std::make_unique<Literal>(context);
+
         if (current_token.type == lexer::T_INT) {
             literal->val->type = ValueType::INT;
             literal->val->value.integer_numb = std::get<int>(current_token.value);
+
         } else if (current_token.type == lexer::T_DOUBLE) {
             literal->val->type = ValueType::DOUBLE;
             literal->val->value.double_numb = std::get<double>(current_token.value);
         }
+
+        advance();
         return literal;
     }
 }

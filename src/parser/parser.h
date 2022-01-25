@@ -60,7 +60,11 @@ namespace parser {
 
         void parseIdentifier(string &ident);
 
-        void parseFuncArgs(vector<string> &args);
+        void parseFuncParams(vector<string> &args);
+
+        void parseFuncArgs(vector<unique_ptr<Expression>> &args, bool noneAllowed = true);
+
+        void parseSingleArg(vector<unique_ptr<Expression>> &args);
 
         unique_ptr<FuncCall> parseFuncCall();
 

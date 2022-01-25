@@ -9,7 +9,8 @@ namespace parser {
     class FuncCall : public Expression {
     public:
 
-        FuncCall(std::string &f_name, std::vector<std::string> &args, std::shared_ptr<interpreter::Context> c);
+        FuncCall(std::string &f_name, std::vector<std::unique_ptr<Expression>> &args,
+                 std::shared_ptr<interpreter::Context> c);
 
         std::string toString(int depth) override;
 
@@ -17,7 +18,7 @@ namespace parser {
 
     private:
         std::string func_name;
-        std::vector<std::string> args;
+        std::vector<std::unique_ptr<Expression>> args;
         std::shared_ptr<interpreter::Context> context;
     };
 }

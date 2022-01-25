@@ -1,6 +1,7 @@
 #include <memory>
 #include <utility>
 #include "operatoroperation.h"
+#include "tln_exception.h"
 
 namespace parser {
     OperatorOperation::OperatorOperation(OperatorType &t, std::unique_ptr<Expression> first_op,
@@ -59,10 +60,12 @@ namespace parser {
         if (type != UNARY_MINUS)
             right_value = second_operand->evaluate();
 
-        if (type == ASSIGN) {
+        if (type == ASSIGN)
             assign(left_value, right_value);
-        } else if (type == PLUS)
+        else if (type == PLUS)
             return addition(left_value, right_value);
+        else if (type == UNARY_MINUS)
+            return negation(left_value);
         //else if (type == MINUS)
         //    return subtraction(left_value, right_value);
         //else if (type == MULTIPLY)
@@ -84,15 +87,38 @@ namespace parser {
         }
             //else if ...
         else
-            throw std::runtime_error("Cannot use addition with specified operands\n");
+            throw tln_exception("Cannot use addition with specified operands\n");
         return returned_val;
     }
 
     void OperatorOperation::assign(const std::shared_ptr<Value> &val1, std::shared_ptr<Value> val2) {
         if (val1->type != ValueType::VARIABLE)
-            throw std::runtime_error("Cannot assign value to non-variable\n");
+            throw tln_exception("Cannot assign value to non-variable\n");
 
         context->addVariable(val1->value_str, std::move(val2));
+    }
+
+    std::shared_ptr<Value> OperatorOperation::negation(std::shared_ptr<Value> val1) {
+        if (val1->type == ValueType::INT) {
+            val1->value.integer_numb *= -1;
+        } else if (val1->type == ValueType::DOUBLE) {
+            val1->value.double_numb *= -1;
+        } else if (val1->type == ValueType::INT_S || val1->type == ValueType::TIME_PERIOD) {
+            val1->value.int_s *= -1;
+        } else if (val1->type == ValueType::INT_MIN) {
+            val1->value.int_min *= -1;
+        } else if (val1->type == ValueType::INT_H) {
+            val1->value.int_h *= -1;
+        } else if (val1->type == ValueType::DOUBLE_S) {
+            val1->value.double_s *= -1;
+        } else if (val1->type == ValueType::DOUBLE_MIN) {
+            val1->value.double_min *= -1;
+        } else if (val1->type == ValueType::DOUBLE_H) {
+            val1->value.double_h *= -1;
+        } else
+            throw tln_exception("Cannot use negation with specified operand\n");
+
+        return val1;
     }
 
 }
