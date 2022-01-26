@@ -1,5 +1,5 @@
-#include <iostream>
 #include "interpreter.h"
+#include "../parser/tln_exception.h"
 
 namespace interpreter {
 
@@ -11,9 +11,9 @@ namespace interpreter {
                 lexer::Lexer lexer(source);
                 parser::Parser parser(lexer, execute_context);
                 programTree = std::move(parser.parseProgram());
-            } catch (std::runtime_error &e) {
+            } catch (tln_exception &e) {
                 hasErrorOccurred = true;
-                std::cout << e.what();
+                std::cerr << e.what();
             }
         }
     }
@@ -23,9 +23,9 @@ namespace interpreter {
             try {
                 programTree->execute();
                 hasExecutionFinished = true;
-            } catch (std::runtime_error &e) {
+            } catch (tln_exception &e) {
                 hasErrorOccurred = true;
-                std::cout << e.what();
+                std::cerr << e.what();
             }
         }
     }

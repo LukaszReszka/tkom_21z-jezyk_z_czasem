@@ -94,7 +94,7 @@ TEST_CASE("SHOW Function") {
 
 TEST_CASE("Assign operator") {
     SUBCASE("Assigning int number") {
-        code = "a = 2";
+        code = "a = 2,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -106,7 +106,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning negative int number") {
-        code = "a = -9";
+        code = "a = -9,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -120,7 +120,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning double number") {
-        code = "pi_numb = 3.14";
+        code = "pi_numb = 3.14,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -132,7 +132,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning negative double number") {
-        code = "negative_PI = -3.14";
+        code = "negative_PI = -3.14,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -146,7 +146,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning another variable") {
-        code = "a = b";
+        code = "a = b,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -158,7 +158,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning result from function call") {
-        code = "a = .func(arg1, arg2)";
+        code = "a = .func(arg1, arg2),";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -174,7 +174,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning time period") {
-        code = "a = [+2:30:54]";
+        code = "a = [+2:30:54],";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -186,7 +186,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning time moment - clock") {
-        code = "a = [^12:59:22]";
+        code = "a = [^12:59:22],";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -198,7 +198,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning time moment - date") {
-        code = "a = [13/12/2021]";
+        code = "a = [13/12/2021],";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -210,7 +210,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning time moment - timestamp") {
-        code = "a = [24/12/2021 18:15:40]";
+        code = "a = [24/12/2021 18:15:40],";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -222,7 +222,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning expression - multiplication") {
-        code = "a = [h]3 * 2";
+        code = "a = [h]3 * 2,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"
@@ -238,7 +238,7 @@ TEST_CASE("Assign operator") {
     }
 
     SUBCASE("Assigning expression - division") {
-        code = "a = [m]60 / 2";
+        code = "a = [m]60 / 2,";
         right_tree = "PROGRAM ROOT\n"
                      "-Operator ASSIGN\n"
                      "--First Operand:\n"

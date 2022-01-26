@@ -3,14 +3,26 @@
  * */
 
 #include "interpreter/interpreter.h"
-#include <sstream>
 
-int main() {
-    std::stringstream code("a = 1,"
-                           "a = 1 + a,"
-                           "SHOW(a)");
-    interpreter::Interpreter interpreter(/*std::cin*/code);
-    interpreter.showProgramTree();
+int main(int argc, char *argv[]) {
+
+    if (argc > 2) {
+        std::cerr << "Too many arguments provided\n";
+        return -1;
+    } else if (argc == 2) {
+        std::string flag(argv[1]);
+        if (flag != "-t") {
+            std::cerr << "Unknown execution flag\n";
+            return -1;
+        }
+    }
+
+    interpreter::Interpreter interpreter(std::cin);
+
+    if (argc == 2)
+        interpreter.showProgramTree();
+
     interpreter.executeProgram();
+    std::cout << "\n";
     return 0;
 }

@@ -12,7 +12,10 @@ namespace interpreter {
 
         explicit Interpreter(std::istream &input);
 
-        inline void showProgramTree() { std::cout << programTree->toString(0); }
+        inline void showProgramTree() {
+            if (!hasErrorOccurred)
+                std::cout << programTree->toString(0) << "\n\n------------------------------\n\n";
+        }
 
         void executeProgram();
 
