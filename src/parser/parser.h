@@ -64,7 +64,7 @@ namespace parser {
 
         void parseFuncArgs(vector<unique_ptr<Expression>> &args, bool noneAllowed = true);
 
-        void parseSingleArg(vector<unique_ptr<Expression>> &args);
+        void parseSingleArg(vector<unique_ptr<Expression>> &args, bool stringAllowed);
 
         unique_ptr<FuncCall> parseFuncCall();
 

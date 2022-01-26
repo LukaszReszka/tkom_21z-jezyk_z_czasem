@@ -191,11 +191,11 @@ namespace parser {
             return;
         }
 
-        parseSingleArg(args);
+        parseSingleArg(args, !noneAllowed);
 
         while (current_token.type == lexer::T_COMMA) {
             advance();
-            parseSingleArg(args);
+            parseSingleArg(args, !noneAllowed);
         }
 
         if (current_token.type != lexer::T_PARENTHESES_2)
@@ -204,8 +204,8 @@ namespace parser {
         advance();
     }
 
-    void Parser::parseSingleArg(vector<unique_ptr<Expression>> &args) {
-        if (current_token.type == lexer::T_STRING) {
+    void Parser::parseSingleArg(vector<unique_ptr<Expression>> &args, bool stringAllowed) {
+        if (stringAllowed && current_token.type == lexer::T_STRING) {
             unique_ptr<Literal> str = std::make_unique<Literal>(context);
             str->val->type = ValueType::STRING;
             str->val->value_str = std::get<std::string>(current_token.value);

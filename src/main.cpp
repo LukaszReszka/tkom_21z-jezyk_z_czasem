@@ -10,11 +10,11 @@ int main() {
 //    interpreter.showProgramTree();
 //    interpreter.execudeProgram();
 
-    string code = "";
+    string code = ".func(\"ala\")";
     std::stringstream code_to_test(code);
     interpreter::Interpreter interpreter(code_to_test);
     interpreter.showProgramTree();
     std::cout << "\n\n\n";
-    interpreter.execudeProgram();
+    //interpreter.execudeProgram();
     return 0;
 }

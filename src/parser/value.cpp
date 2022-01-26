@@ -2,37 +2,38 @@
 
 namespace parser {
 
-    std::string Value::toString() {
-        if (type == INT) {
-            return std::to_string(value.integer_numb);
-        } else if (type == DOUBLE) {
-            return std::to_string(value.double_numb);
-        } else if (type == STRING || type == VARIABLE) {
-            return value_str;
-        } else if (type == BOOL) {
-            return std::to_string(value.boolean);
-        } else if (type == TIME_PERIOD) {
-            return std::to_string(value.int_s.count()) + "s";
-        } else if (type == DATE || type == TIMESTAMP || type == CLOCK) {
-            return timeMomentToString();
-        } else if (type == INT_S) {
-            return std::to_string(value.int_s.count()) + "s";
-        } else if (type == INT_MIN) {
-            return std::to_string(value.int_min.count()) + "m";
-        } else if (type == INT_H) {
-            return std::to_string(value.int_h.count()) + "h";
-        } else if (type == DOUBLE_S) {
-            return std::to_string(value.double_s.count()) + "s";
-        } else if (type == DOUBLE_MIN) {
-            return std::to_string(value.double_min.count()) + "m";
-        } else if (type == DOUBLE_H) {
-            return std::to_string(value.double_h.count()) + "h";
-        }
-        return "";
+    std::string Value::toString() const {
+        std::string text_rep;
+        if (type == INT)
+            text_rep = std::to_string(value.integer_numb);
+        else if (type == DOUBLE)
+            text_rep = std::to_string(value.double_numb);
+        else if (type == STRING || type == VARIABLE)
+            text_rep = value_str;
+        else if (type == BOOL)
+            text_rep = std::to_string(value.boolean);
+        else if (type == TIME_PERIOD)
+            text_rep = std::to_string(value.int_s.count()) + "s";
+        else if (type == DATE || type == TIMESTAMP || type == CLOCK)
+            text_rep = timeMomentToString();
+        else if (type == INT_S)
+            text_rep = std::to_string(value.int_s.count()) + "s";
+        else if (type == INT_MIN)
+            text_rep = std::to_string(value.int_min.count()) + "m";
+        else if (type == INT_H)
+            text_rep = std::to_string(value.int_h.count()) + "h";
+        else if (type == DOUBLE_S)
+            text_rep = std::to_string(value.double_s.count()) + "s";
+        else if (type == DOUBLE_MIN)
+            text_rep = std::to_string(value.double_min.count()) + "m";
+        else if (type == DOUBLE_H)
+            text_rep = std::to_string(value.double_h.count()) + "h";
+
+        return text_rep;
     }
 
-    std::string Value::timeMomentToString() {
-        std::string text_rep = "";
+    std::string Value::timeMomentToString() const {
+        std::string text_rep;
         int temp;
         if (type == DATE || type == TIMESTAMP) {
             temp = timeMoment.getDay();
