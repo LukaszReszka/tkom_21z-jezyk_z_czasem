@@ -3,10 +3,14 @@
  * */
 
 #include "interpreter/interpreter.h"
+#include <sstream>
 
 int main() {
-    interpreter::Interpreter interpreter(std::cin);
-//    interpreter.showProgramTree();
+    std::stringstream code("a = 1,"
+                           "a = 1 + a,"
+                           "SHOW(a)");
+    interpreter::Interpreter interpreter(/*std::cin*/code);
+    interpreter.showProgramTree();
     interpreter.executeProgram();
     return 0;
 }

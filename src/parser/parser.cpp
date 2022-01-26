@@ -104,7 +104,14 @@ namespace parser {
         var->val->type = ValueType::VARIABLE;
         var->val->value_str = variable_name;
 
-        return std::make_unique<OperatorOperation>(t, std::move(var), std::move(parseArithmeticExpr()), context);
+        unique_ptr<OperatorOperation> assign_op = std::make_unique<OperatorOperation>(t, std::move(var),
+                                                                                      std::move(parseArithmeticExpr()),
+                                                                                      context);
+        if (current_token.type != lexer::T_COMMA)
+            throw tln_exception("Lack of \",\"");
+
+        advance();
+        return assign_op;
     }
 
     unique_ptr<ShowFunc> Parser::parseShowFunc() {

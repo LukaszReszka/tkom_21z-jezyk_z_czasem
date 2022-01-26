@@ -66,11 +66,11 @@ namespace parser {
         if (type == ASSIGN)
             assign(right_value);
         else if (type == PLUS)
-            return addition(left_value, right_value);
+            return checkTypesAndPerformOperation(left_value, right_value);
         else if (type == UNARY_MINUS)
             return negation(left_value);
         else if (type == EQUAL)
-            equals(left_value, right_value);
+            checkSymmetrically(left_value, right_value);
         //else if (type == MINUS)
         //    return subtraction(left_value, right_value);
         //else if (type == MULTIPLY)
@@ -81,204 +81,489 @@ namespace parser {
         return {};
     }
 
-    std::shared_ptr<Value> OperatorOperation::addition(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
-        std::shared_ptr<Value> returned_val = std::make_shared<Value>();
-        if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
-            returned_val->type = ValueType::INT;
-            returned_val->value.integer_numb = val1->value.integer_numb + val2->value.integer_numb;
-        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::INT_H;
-            returned_val->value.int_h = val1->value.int_h + val2->value.int_h;
-        } else if (val1->type <= ValueType::INT_H && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::INT_MIN;
-            returned_val->value.int_min = val1->value.int_h + val2->value.int_min;
-        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::INT_MIN;
-            returned_val->value.int_min = val1->value.int_min + val2->value.int_h;
-        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::INT_MIN;
-            returned_val->value.int_min = val1->value.int_min + val2->value.int_min;
-        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::INT_S;
-            returned_val->value.int_s = val1->value.int_s + val2->value.int_min;
-        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::INT_S;
-            returned_val->value.int_s = val1->value.int_s + val2->value.int_h;
-        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::INT_S;
-            returned_val->value.int_s = val2->value.int_s + val1->value.int_min;
-        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_H) {
-            returned_val->type = ValueType::INT_S;
-            returned_val->value.int_s = val2->value.int_s + val1->value.int_h;
-        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_S) {
-            returned_val->type = ValueType::INT_S;
-            returned_val->value.int_s = val2->value.int_s + val1->value.int_s;
-        } else if (val1->type == ValueType::DOUBLE && val2->type == ValueType::DOUBLE) {
-            returned_val->type = ValueType::DOUBLE;
-            returned_val->value.double_numb = val1->value.double_numb + val2->value.double_numb;
-        } else if (val1->type == ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::DOUBLE_H;
-            returned_val->value.double_h = val1->value.double_h + val2->value.double_h;
-        } else if (val1->type <= ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::DOUBLE_MIN;
-            returned_val->value.double_min = val1->value.double_h + val2->value.double_min;
-        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::DOUBLE_MIN;
-            returned_val->value.double_min = val1->value.double_min + val2->value.double_h;
-        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::DOUBLE_MIN;
-            returned_val->value.double_min = val1->value.double_min + val2->value.double_min;
-        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::DOUBLE_S;
-            returned_val->value.double_s = val1->value.double_s + val2->value.double_min;
-        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::DOUBLE_S;
-            returned_val->value.double_s = val1->value.double_s + val2->value.double_h;
-        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::DOUBLE_S;
-            returned_val->value.double_s = val2->value.double_s + val1->value.double_min;
-        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::DOUBLE_S;
-            returned_val->value.double_s = val2->value.double_s + val1->value.double_h;
-        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_S) {
-            returned_val->type = ValueType::DOUBLE_S;
-            returned_val->value.double_s = val2->value.double_s + val1->value.double_s;
-        } else
-            throw tln_exception("Cannot use addition with specified operands\n");
-        return returned_val;
+    std::shared_ptr<Value>
+    OperatorOperation::checkTypesAndPerformOperation(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
+        std::shared_ptr<Value> returned_val;
+
+        returned_val = checkSymmetrically(val1, val2);
+        if (returned_val->type != ValueType::NONE)
+            return returned_val;
+
+        returned_val = checkSymmetrically(val2, val1, true);
+        if (returned_val->type != ValueType::NONE)
+            return returned_val;
+
+        throw tln_exception("Cannot use operator with specified operands\n");
     }
 
-    std::shared_ptr<Value> OperatorOperation::equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
+    std::shared_ptr<Value>
+    OperatorOperation::checkSymmetrically(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2, bool swappedArgs) {
         std::shared_ptr<Value> returned_val = std::make_shared<Value>();
-        if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.integer_numb == val2->value.integer_numb;
-        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_h == val2->value.int_h;
-        } else if (val1->type <= ValueType::INT_H && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_h == val2->value.int_min;
-        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_min == val2->value.int_h;
-        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_min == val2->value.int_min;
-        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_s == val2->value.int_min;
-        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_s == val2->value.int_h;
-        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.int_s == val1->value.int_min;
-        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.int_s == val1->value.int_h;
-        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_S) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.int_s == val1->value.int_s;
-        } else if (val1->type == ValueType::DOUBLE && val2->type == ValueType::DOUBLE) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_numb == val2->value.double_numb;
-        } else if (val1->type == ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_h == val2->value.double_h;
-        } else if (val1->type <= ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_h == val2->value.double_min;
+
+        if (val1->type == ValueType::INT && val2->type == ValueType::DOUBLE) {
+
+            if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                returned_val->type = ValueType::BOOL;
+                if (type == OperatorType::EQUAL) {
+                    returned_val->value.boolean = (val1->value.integer_numb == val2->value.double_numb);
+                } else if (type == OperatorType::NOT_EQUAL) {
+                    returned_val->value.boolean = (val1->value.integer_numb != val2->value.double_numb);
+                } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                           (swappedArgs && type == OperatorType::LESS)) {
+                    returned_val->value.boolean = (val1->value.integer_numb > val2->value.double_numb);
+                } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                           (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                    returned_val->value.boolean = (val1->value.integer_numb >= val2->value.double_numb);
+                } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                           (swappedArgs && type == OperatorType::GREATER)) {
+                    returned_val->value.boolean = (val1->value.integer_numb < val2->value.double_numb);
+                } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                           (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                    returned_val->value.boolean = (val1->value.integer_numb <= val2->value.double_numb);
+                }
+            } else if (type == OperatorType::PLUS) {
+                returned_val->type = ValueType::DOUBLE;
+                returned_val->value.double_numb = val1->value.integer_numb + val2->value.double_numb;
+            } else if (type == OperatorType::MINUS) {
+                returned_val->type = ValueType::DOUBLE;
+                returned_val->value.double_numb = val1->value.integer_numb - val2->value.double_numb;
+            }
+
+        } else if (val1->type == ValueType::INT_S || val1->type == ValueType::TIME_PERIOD) {
+            if (val2->type == ValueType::INT_MIN) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s == val2->value.int_min);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s != val2->value.int_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_s > val2->value.int_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s >= val2->value.int_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_s < val2->value.int_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s <= val2->value.int_min);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::INT_S;
+                    returned_val->value.int_s = val1->value.int_s + val2->value.int_min;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::INT_S;
+                    returned_val->value.int_s = val1->value.int_s - val2->value.int_min;
+                }
+
+            } else if (val2->type == ValueType::INT_H) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s == val2->value.int_h);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s != val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_s > val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s >= val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_s < val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s <= val2->value.int_h);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::INT_S;
+                    returned_val->value.int_s = val1->value.int_s + val2->value.int_h;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::INT_S;
+                    returned_val->value.int_s = val1->value.int_s - val2->value.int_h;
+                }
+
+            } else if (val2->type == ValueType::DOUBLE_S) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s == val2->value.double_s);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s != val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_s > val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s >= val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_s < val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s <= val2->value.double_s);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_s + val2->value.double_s;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_s - val2->value.double_s;
+                }
+            } else if (val2->type == ValueType::DOUBLE_MIN) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s == val2->value.double_min);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s != val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_s > val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s >= val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_s < val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s <= val2->value.double_min);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_s + val2->value.double_min;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_s - val2->value.double_min;
+                }
+            } else if (val2->type == ValueType::DOUBLE_H) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s == val2->value.double_h);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_s != val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_s > val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s >= val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_s < val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_s <= val2->value.double_h);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_s + val2->value.double_h;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_s - val2->value.double_h;
+                }
+            }
+
+        } else if (val1->type == ValueType::INT_MIN) {
+            if (val2->type == ValueType::INT_H) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min == val2->value.int_h);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min != val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_min > val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min >= val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_min < val2->value.int_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min <= val2->value.int_h);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::INT_MIN;
+                    returned_val->value.int_min = val1->value.int_min + val2->value.int_h;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::INT_MIN;
+                    returned_val->value.int_min = val1->value.int_min - val2->value.int_h;
+                }
+
+            } else if (val2->type == ValueType::DOUBLE_S) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min == val2->value.double_s);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min != val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_min > val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min >= val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_min < val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min <= val2->value.double_s);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_min + val2->value.double_s;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_min - val2->value.double_s;
+                }
+            } else if (val2->type == ValueType::DOUBLE_MIN) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min == val2->value.double_min);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min != val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_min > val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min >= val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_min < val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min <= val2->value.double_min);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_MIN;
+                    returned_val->value.double_min = val1->value.int_min + val2->value.double_min;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_MIN;
+                    returned_val->value.double_min = val1->value.int_min - val2->value.double_min;
+                }
+            } else if (val2->type == ValueType::DOUBLE_H) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min == val2->value.double_h);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_min != val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_min > val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min >= val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_min < val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_min <= val2->value.double_h);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_MIN;
+                    returned_val->value.double_min = val1->value.int_min + val2->value.double_h;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_MIN;
+                    returned_val->value.double_min = val1->value.int_min - val2->value.double_h;
+                }
+            }
+
+        } else if (val1->type == ValueType::INT_H) {
+            if (val2->type == ValueType::DOUBLE_S) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_h == val2->value.double_s);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_h != val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_h > val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_h >= val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_h < val2->value.double_s);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_h <= val2->value.double_s);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_h + val2->value.double_s;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.int_h - val2->value.double_s;
+                }
+            } else if (val2->type == ValueType::DOUBLE_MIN) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_h == val2->value.double_min);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_h != val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_h > val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_h >= val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_h < val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_h <= val2->value.double_min);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_MIN;
+                    returned_val->value.double_min = val1->value.int_h + val2->value.double_min;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_MIN;
+                    returned_val->value.double_min = val1->value.int_h - val2->value.double_min;
+                }
+            } else if (val2->type == ValueType::DOUBLE_H) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_h == val2->value.double_h);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.int_h != val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.int_h > val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_h >= val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.int_h < val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.int_h <= val2->value.double_h);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_H;
+                    returned_val->value.double_h = val1->value.int_h + val2->value.double_h;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_H;
+                    returned_val->value.double_h = val1->value.int_h - val2->value.double_h;
+                }
+            }
+
+        } else if (val1->type == ValueType::DOUBLE_S) {
+            if (val2->type == ValueType::DOUBLE_MIN) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.double_s == val2->value.double_min);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.double_s != val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.double_s > val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.double_s >= val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.double_s < val2->value.double_min);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.double_s <= val2->value.double_min);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.double_s + val2->value.double_min;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.double_s - val2->value.double_min;
+                }
+            } else if (val2->type == ValueType::DOUBLE_H) {
+                if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                    returned_val->type = ValueType::BOOL;
+                    if (type == OperatorType::EQUAL) {
+                        returned_val->value.boolean = (val1->value.double_s == val2->value.double_h);
+                    } else if (type == OperatorType::NOT_EQUAL) {
+                        returned_val->value.boolean = (val1->value.double_s != val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                               (swappedArgs && type == OperatorType::LESS)) {
+                        returned_val->value.boolean = (val1->value.double_s > val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                               (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.double_s >= val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                               (swappedArgs && type == OperatorType::GREATER)) {
+                        returned_val->value.boolean = (val1->value.double_s < val2->value.double_h);
+                    } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                               (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                        returned_val->value.boolean = (val1->value.double_s <= val2->value.double_h);
+                    }
+                } else if (type == OperatorType::PLUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.double_s + val2->value.double_h;
+                } else if (type == OperatorType::MINUS) {
+                    returned_val->type = ValueType::DOUBLE_S;
+                    returned_val->value.double_s = val1->value.double_s - val2->value.double_h;
+                }
+            }
         } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_min == val2->value.double_h;
-        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_min == val2->value.double_min;
-        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_s == val2->value.double_min;
-        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_s == val2->value.double_h;
-        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.double_s == val1->value.double_min;
-        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.double_s == val1->value.double_h;
-        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_S) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.double_s == val1->value.double_s;
-        } else
-            throw tln_exception("Cannot use addition with specified operands\n");
-        return returned_val;
+            if (type >= OperatorType::EQUAL && type <= OperatorType::LESS_EQUAL) {
+                returned_val->type = ValueType::BOOL;
+                if (type == OperatorType::EQUAL) {
+                    returned_val->value.boolean = (val1->value.double_min == val2->value.double_h);
+                } else if (type == OperatorType::NOT_EQUAL) {
+                    returned_val->value.boolean = (val1->value.double_min != val2->value.double_h);
+                } else if ((!swappedArgs && type == OperatorType::GREATER) ||
+                           (swappedArgs && type == OperatorType::LESS)) {
+                    returned_val->value.boolean = (val1->value.double_min > val2->value.double_h);
+                } else if ((!swappedArgs && type == OperatorType::GREATER_EQUAL) ||
+                           (swappedArgs && type == OperatorType::LESS_EQUAL)) {
+                    returned_val->value.boolean = (val1->value.double_min >= val2->value.double_h);
+                } else if ((!swappedArgs && type == OperatorType::LESS) ||
+                           (swappedArgs && type == OperatorType::GREATER)) {
+                    returned_val->value.boolean = (val1->value.double_min < val2->value.double_h);
+                } else if ((!swappedArgs && type == OperatorType::LESS_EQUAL) ||
+                           (swappedArgs && type == OperatorType::GREATER_EQUAL)) {
+                    returned_val->value.boolean = (val1->value.double_min <= val2->value.double_h);
+                }
+            } else if (type == OperatorType::PLUS) {
+                returned_val->type = ValueType::DOUBLE_MIN;
+                returned_val->value.double_min = val1->value.double_min + val2->value.double_h;
+            } else if (type == OperatorType::MINUS) {
+                returned_val->type = ValueType::DOUBLE_MIN;
+                returned_val->value.double_min = val1->value.double_min - val2->value.double_h;
+            }
+        }
+
+        if (type == OperatorType::MINUS && swappedArgs && returned_val->type != ValueType::NONE)
+            return negation(returned_val);
+        else
+            return returned_val;
     }
 
-    std::shared_ptr<Value> OperatorOperation::not_equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
+    std::shared_ptr<Value>
+    OperatorOperation::checkSameTypes(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
         std::shared_ptr<Value> returned_val = std::make_shared<Value>();
         if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
             returned_val->type = ValueType::BOOL;
             returned_val->value.boolean = val1->value.integer_numb != val2->value.integer_numb;
-        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_h != val2->value.int_h;
-        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_h != val2->value.int_min;
-        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_min != val2->value.int_h;
-        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_min != val2->value.int_min;
-        } else if (val1->type != ValueType::INT_S && val2->type != ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_s != val2->value.int_min;
-        } else if (val1->type != ValueType::INT_S && val2->type != ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.int_s != val2->value.int_h;
-        } else if (val2->type != ValueType::INT_S && val1->type != ValueType::INT_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.int_s != val1->value.int_min;
-        } else if (val2->type != ValueType::INT_S && val1->type != ValueType::INT_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.int_s != val1->value.int_h;
-        } else if (val2->type != ValueType::INT_S && val1->type != ValueType::INT_S) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.int_s != val1->value.int_s;
-        } else if (val1->type != ValueType::DOUBLE && val2->type != ValueType::DOUBLE) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_numb != val2->value.double_numb;
-        } else if (val1->type != ValueType::DOUBLE_H && val2->type != ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_h != val2->value.double_h;
-        } else if (val1->type <= ValueType::DOUBLE_H && val2->type != ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_h != val2->value.double_min;
-        } else if (val1->type != ValueType::DOUBLE_MIN && val2->type != ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_min != val2->value.double_h;
-        } else if (val1->type != ValueType::DOUBLE_MIN && val2->type != ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_min != val2->value.double_min;
-        } else if (val1->type != ValueType::DOUBLE_S && val2->type != ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_s != val2->value.double_min;
-        } else if (val1->type != ValueType::DOUBLE_S && val2->type != ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val1->value.double_s != val2->value.double_h;
-        } else if (val2->type != ValueType::DOUBLE_S && val1->type != ValueType::DOUBLE_MIN) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.double_s != val1->value.double_min;
-        } else if (val2->type != ValueType::DOUBLE_S && val1->type != ValueType::DOUBLE_H) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.double_s != val1->value.double_h;
-        } else if (val2->type != ValueType::DOUBLE_S && val1->type != ValueType::DOUBLE_S) {
-            returned_val->type = ValueType::BOOL;
-            returned_val->value.boolean = val2->value.double_s != val1->value.double_s;
         } else
-            throw tln_exception("Cannot use addition with specified operands\n");
+            throw tln_exception("Cannot use checkTypesAndPerformOperation with specified operands\n");
         return returned_val;
     }
 
@@ -292,27 +577,27 @@ namespace parser {
     }
 
 
-    std::shared_ptr<Value> OperatorOperation::negation(std::shared_ptr<Value> val1) {
-        if (val1->type == ValueType::INT) {
-            val1->value.integer_numb *= -1;
-        } else if (val1->type == ValueType::DOUBLE) {
-            val1->value.double_numb *= -1;
-        } else if (val1->type == ValueType::INT_S || val1->type == ValueType::TIME_PERIOD) {
-            val1->value.int_s *= -1;
-        } else if (val1->type == ValueType::INT_MIN) {
-            val1->value.int_min *= -1;
-        } else if (val1->type == ValueType::INT_H) {
-            val1->value.int_h *= -1;
-        } else if (val1->type == ValueType::DOUBLE_S) {
-            val1->value.double_s *= -1;
-        } else if (val1->type == ValueType::DOUBLE_MIN) {
-            val1->value.double_min *= -1;
-        } else if (val1->type == ValueType::DOUBLE_H) {
-            val1->value.double_h *= -1;
+    std::shared_ptr<Value> OperatorOperation::negation(std::shared_ptr<Value> val) {
+        if (val->type == ValueType::INT) {
+            val->value.integer_numb *= -1;
+        } else if (val->type == ValueType::DOUBLE) {
+            val->value.double_numb *= -1;
+        } else if (val->type == ValueType::INT_S || val->type == ValueType::TIME_PERIOD) {
+            val->value.int_s *= -1;
+        } else if (val->type == ValueType::INT_MIN) {
+            val->value.int_min *= -1;
+        } else if (val->type == ValueType::INT_H) {
+            val->value.int_h *= -1;
+        } else if (val->type == ValueType::DOUBLE_S) {
+            val->value.double_s *= -1;
+        } else if (val->type == ValueType::DOUBLE_MIN) {
+            val->value.double_min *= -1;
+        } else if (val->type == ValueType::DOUBLE_H) {
+            val->value.double_h *= -1;
         } else
             throw tln_exception("Cannot use negation with specified operand\n");
 
-        return val1;
+        return val;
     }
 
 }

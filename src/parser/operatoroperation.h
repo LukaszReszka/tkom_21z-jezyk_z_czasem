@@ -31,15 +31,16 @@ namespace parser {
         std::unique_ptr<Expression> first_operand, second_operand;
         std::shared_ptr<interpreter::Context> context;
 
-        std::shared_ptr<Value> addition(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+        std::shared_ptr<Value> checkTypesAndPerformOperation(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
 
-        std::shared_ptr<Value> negation(std::shared_ptr<Value> val1);
+        std::shared_ptr<Value> negation(std::shared_ptr<Value> val);
 
         void assign(std::shared_ptr<Value> val);
 
-        std::shared_ptr<Value> equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+        std::shared_ptr<Value>
+        checkSymmetrically(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2, bool swappedArgs = false);
 
-        std::shared_ptr<Value> not_equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+        std::shared_ptr<Value> checkSameTypes(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
     };
 
 }
