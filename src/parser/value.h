@@ -38,9 +38,9 @@ namespace parser {
         std::string value_str;
         lexer::TimeMoment timeMoment;
 
-        std::string toString() const;
+        [[nodiscard]] std::string toString() const;
 
-        std::string timeMomentToString() const;
+        [[nodiscard]] std::string timeMomentToString() const;
     };
 }
 

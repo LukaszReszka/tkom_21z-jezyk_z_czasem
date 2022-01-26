@@ -31,16 +31,28 @@ namespace parser {
         std::unique_ptr<Expression> first_operand, second_operand;
         std::shared_ptr<interpreter::Context> context;
 
-        std::shared_ptr<Value> checkTypesAndPerformOperation(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+        std::shared_ptr<Value>
+        checkTypesAndPerformOperation(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2);
 
-        std::shared_ptr<Value> negation(std::shared_ptr<Value> val);
+        static std::shared_ptr<Value> negation(std::shared_ptr<Value> val);
 
         void assign(std::shared_ptr<Value> val);
 
         std::shared_ptr<Value>
-        checkSymmetrically(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2, bool swappedArgs = false);
+        checkSymmetrically(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2,
+                           bool swappedArgs = false);
 
-        std::shared_ptr<Value> checkSameTypes(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+        std::shared_ptr<Value> checkSameTypes(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2);
+
+        static std::shared_ptr<Value> multiply(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2);
+
+        static std::shared_ptr<Value>
+        multiplicationSymmetricalCheck(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2);
+
+        std::shared_ptr<Value> divide(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2);
+
+        std::shared_ptr<Value>
+        logicalOperations(const std::shared_ptr<Value> &val1, const std::shared_ptr<Value> &val2);
     };
 
 }

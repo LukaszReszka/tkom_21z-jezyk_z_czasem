@@ -15,7 +15,7 @@ namespace lexer {
             moment.tm_sec = 0;
         }
 
-        std::tm moment{};
+        std::tm moment{0};
 
         [[nodiscard]] int getYear() const {
             return moment.tm_year + 1900;
