@@ -69,6 +69,8 @@ namespace parser {
             return addition(left_value, right_value);
         else if (type == UNARY_MINUS)
             return negation(left_value);
+        else if (type == EQUAL)
+            equals(left_value, right_value);
         //else if (type == MINUS)
         //    return subtraction(left_value, right_value);
         //else if (type == MULTIPLY)
@@ -146,6 +148,140 @@ namespace parser {
         return returned_val;
     }
 
+    std::shared_ptr<Value> OperatorOperation::equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
+        std::shared_ptr<Value> returned_val = std::make_shared<Value>();
+        if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.integer_numb == val2->value.integer_numb;
+        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_h == val2->value.int_h;
+        } else if (val1->type <= ValueType::INT_H && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_h == val2->value.int_min;
+        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_min == val2->value.int_h;
+        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_min == val2->value.int_min;
+        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_s == val2->value.int_min;
+        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_s == val2->value.int_h;
+        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.int_s == val1->value.int_min;
+        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.int_s == val1->value.int_h;
+        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_S) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.int_s == val1->value.int_s;
+        } else if (val1->type == ValueType::DOUBLE && val2->type == ValueType::DOUBLE) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_numb == val2->value.double_numb;
+        } else if (val1->type == ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_h == val2->value.double_h;
+        } else if (val1->type <= ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_h == val2->value.double_min;
+        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_min == val2->value.double_h;
+        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_min == val2->value.double_min;
+        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_s == val2->value.double_min;
+        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_s == val2->value.double_h;
+        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.double_s == val1->value.double_min;
+        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.double_s == val1->value.double_h;
+        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_S) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.double_s == val1->value.double_s;
+        } else
+            throw tln_exception("Cannot use addition with specified operands\n");
+        return returned_val;
+    }
+
+    std::shared_ptr<Value> OperatorOperation::not_equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
+        std::shared_ptr<Value> returned_val = std::make_shared<Value>();
+        if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.integer_numb != val2->value.integer_numb;
+        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_h != val2->value.int_h;
+        } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_h != val2->value.int_min;
+        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_min != val2->value.int_h;
+        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_min != val2->value.int_min;
+        } else if (val1->type != ValueType::INT_S && val2->type != ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_s != val2->value.int_min;
+        } else if (val1->type != ValueType::INT_S && val2->type != ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.int_s != val2->value.int_h;
+        } else if (val2->type != ValueType::INT_S && val1->type != ValueType::INT_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.int_s != val1->value.int_min;
+        } else if (val2->type != ValueType::INT_S && val1->type != ValueType::INT_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.int_s != val1->value.int_h;
+        } else if (val2->type != ValueType::INT_S && val1->type != ValueType::INT_S) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.int_s != val1->value.int_s;
+        } else if (val1->type != ValueType::DOUBLE && val2->type != ValueType::DOUBLE) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_numb != val2->value.double_numb;
+        } else if (val1->type != ValueType::DOUBLE_H && val2->type != ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_h != val2->value.double_h;
+        } else if (val1->type <= ValueType::DOUBLE_H && val2->type != ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_h != val2->value.double_min;
+        } else if (val1->type != ValueType::DOUBLE_MIN && val2->type != ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_min != val2->value.double_h;
+        } else if (val1->type != ValueType::DOUBLE_MIN && val2->type != ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_min != val2->value.double_min;
+        } else if (val1->type != ValueType::DOUBLE_S && val2->type != ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_s != val2->value.double_min;
+        } else if (val1->type != ValueType::DOUBLE_S && val2->type != ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val1->value.double_s != val2->value.double_h;
+        } else if (val2->type != ValueType::DOUBLE_S && val1->type != ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.double_s != val1->value.double_min;
+        } else if (val2->type != ValueType::DOUBLE_S && val1->type != ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.double_s != val1->value.double_h;
+        } else if (val2->type != ValueType::DOUBLE_S && val1->type != ValueType::DOUBLE_S) {
+            returned_val->type = ValueType::BOOL;
+            returned_val->value.boolean = val2->value.double_s != val1->value.double_s;
+        } else
+            throw tln_exception("Cannot use addition with specified operands\n");
+        return returned_val;
+    }
+
     void OperatorOperation::assign(std::shared_ptr<Value> val) {
         std::unique_ptr<Literal> literal = reinterpret_cast<std::unique_ptr<Literal> &&>(first_operand);
 
@@ -154,6 +290,7 @@ namespace parser {
 
         context->addVariable(literal->val->value_str, std::move(val));
     }
+
 
     std::shared_ptr<Value> OperatorOperation::negation(std::shared_ptr<Value> val1) {
         if (val1->type == ValueType::INT) {

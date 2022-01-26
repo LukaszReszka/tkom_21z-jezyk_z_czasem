@@ -36,6 +36,10 @@ namespace parser {
         std::shared_ptr<Value> negation(std::shared_ptr<Value> val1);
 
         void assign(std::shared_ptr<Value> val);
+
+        std::shared_ptr<Value> equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
+
+        std::shared_ptr<Value> not_equals(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2);
     };
 
 }
