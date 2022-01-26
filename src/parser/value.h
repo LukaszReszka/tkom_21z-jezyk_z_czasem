@@ -9,6 +9,7 @@ using std::ratio, std::chrono::duration;
 
 namespace parser {
     enum ValueType {
+        NONE,
         INT, DOUBLE,
         STRING, BOOL,
         TIME_PERIOD, DATE, TIMESTAMP, CLOCK,

@@ -35,13 +35,11 @@ namespace interpreter {
     }
 
     void Context::removeScope() {
-        if (!reachedFinalReturn) {
-            if (funcs_context.empty())
-                global_scopes.removeScopeFromContext();
-            else
-                funcs_context.back().removeScopeFromContext();
+        if (funcs_context.empty())
+            global_scopes.removeScopeFromContext();
+        else
+            funcs_context.back().removeScopeFromContext();
 
-        }
     }
 
     void Context::addVariable(std::string &name, std::unique_ptr<Value> value) {
@@ -78,6 +76,10 @@ namespace interpreter {
     }
 
     void Context::removeFunCallContext() {
-        funcs_context.pop_back();
+        if (!funcs_context.empty()) {
+            funcs_context.pop_back();
+            endProgramExecution = false;
+            returned_value = std::make_shared<Value>();
+        }
     }
 }

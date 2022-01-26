@@ -18,7 +18,7 @@ namespace interpreter {
         }
     }
 
-    void Interpreter::execudeProgram() {
+    void Interpreter::executeProgram() {
         if (!hasErrorOccurred && !hasExecutionFinished) {
             try {
                 programTree->execute();

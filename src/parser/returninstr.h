@@ -3,11 +3,12 @@
 
 #include "phrase.h"
 #include "expression.h"
+#include "../interpreter/context.h"
 
 namespace parser {
     class ReturnInstr : public Phrase {
     public:
-        explicit ReturnInstr(std::unique_ptr<Expression> ret_val);
+        explicit ReturnInstr(std::unique_ptr<Expression> ret_val, std::shared_ptr<interpreter::Context> c);
 
         std::string toString(int depth) override;
 
@@ -15,6 +16,7 @@ namespace parser {
 
     private:
         std::unique_ptr<Expression> returned_value;
+        std::shared_ptr<interpreter::Context> context;
     };
 }
 

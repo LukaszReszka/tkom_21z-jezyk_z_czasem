@@ -13,7 +13,8 @@ namespace interpreter {
     class Context {
     public:
 
-        bool reachedFinalReturn = false;
+        bool endProgramExecution = false;
+        std::shared_ptr<Value> returned_value;
 
         void saveFuncDef(std::string &name, std::vector<std::string> &params,
                          std::vector<std::unique_ptr<Phrase>> &body);

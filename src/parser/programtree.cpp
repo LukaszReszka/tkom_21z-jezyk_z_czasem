@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include "programtree.h"
 
 namespace parser {
@@ -10,7 +11,12 @@ namespace parser {
     }
 
     void ProgramTree::execute() {
-        for (auto &c: commands)
+        for (auto &c: commands) {
             c->execute();
+            if (context->endProgramExecution) {
+                std::cout << "\nRETURNED: " + context->returned_value->toString() + "\n";
+                break;
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 #include <utility>
 #include "operatoroperation.h"
 #include "tln_exception.h"
+#include "literal.h"
 
 namespace parser {
     OperatorOperation::OperatorOperation(OperatorType &t, std::unique_ptr<Expression> first_op,
@@ -55,13 +56,15 @@ namespace parser {
     }
 
     std::shared_ptr<Value> OperatorOperation::evaluate() {
-        std::shared_ptr<Value> left_value = first_operand->evaluate();
-        std::shared_ptr<Value> right_value;
+        std::shared_ptr<Value> left_value, right_value;
+        if (type != ASSIGN)
+            left_value = first_operand->evaluate();
+
         if (type != UNARY_MINUS)
             right_value = second_operand->evaluate();
 
         if (type == ASSIGN)
-            assign(left_value, right_value);
+            assign(right_value);
         else if (type == PLUS)
             return addition(left_value, right_value);
         else if (type == UNARY_MINUS)
@@ -77,25 +80,79 @@ namespace parser {
     }
 
     std::shared_ptr<Value> OperatorOperation::addition(std::shared_ptr<Value> val1, std::shared_ptr<Value> val2) {
-        std::shared_ptr<Value> returned_val;
+        std::shared_ptr<Value> returned_val = std::make_shared<Value>();
         if (val1->type == ValueType::INT && val2->type == ValueType::INT) {
             returned_val->type = ValueType::INT;
             returned_val->value.integer_numb = val1->value.integer_numb + val2->value.integer_numb;
         } else if (val1->type == ValueType::INT_H && val2->type == ValueType::INT_H) {
             returned_val->type = ValueType::INT_H;
             returned_val->value.int_h = val1->value.int_h + val2->value.int_h;
-        }
-            //else if ...
-        else
+        } else if (val1->type <= ValueType::INT_H && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::INT_MIN;
+            returned_val->value.int_min = val1->value.int_h + val2->value.int_min;
+        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::INT_MIN;
+            returned_val->value.int_min = val1->value.int_min + val2->value.int_h;
+        } else if (val1->type == ValueType::INT_MIN && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::INT_MIN;
+            returned_val->value.int_min = val1->value.int_min + val2->value.int_min;
+        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::INT_S;
+            returned_val->value.int_s = val1->value.int_s + val2->value.int_min;
+        } else if (val1->type == ValueType::INT_S && val2->type == ValueType::INT_H) {
+            returned_val->type = ValueType::INT_S;
+            returned_val->value.int_s = val1->value.int_s + val2->value.int_h;
+        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_MIN) {
+            returned_val->type = ValueType::INT_S;
+            returned_val->value.int_s = val2->value.int_s + val1->value.int_min;
+        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_H) {
+            returned_val->type = ValueType::INT_S;
+            returned_val->value.int_s = val2->value.int_s + val1->value.int_h;
+        } else if (val2->type == ValueType::INT_S && val1->type == ValueType::INT_S) {
+            returned_val->type = ValueType::INT_S;
+            returned_val->value.int_s = val2->value.int_s + val1->value.int_s;
+        } else if (val1->type == ValueType::DOUBLE && val2->type == ValueType::DOUBLE) {
+            returned_val->type = ValueType::DOUBLE;
+            returned_val->value.double_numb = val1->value.double_numb + val2->value.double_numb;
+        } else if (val1->type == ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::DOUBLE_H;
+            returned_val->value.double_h = val1->value.double_h + val2->value.double_h;
+        } else if (val1->type <= ValueType::DOUBLE_H && val2->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::DOUBLE_MIN;
+            returned_val->value.double_min = val1->value.double_h + val2->value.double_min;
+        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::DOUBLE_MIN;
+            returned_val->value.double_min = val1->value.double_min + val2->value.double_h;
+        } else if (val1->type == ValueType::DOUBLE_MIN && val2->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::DOUBLE_MIN;
+            returned_val->value.double_min = val1->value.double_min + val2->value.double_min;
+        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::DOUBLE_S;
+            returned_val->value.double_s = val1->value.double_s + val2->value.double_min;
+        } else if (val1->type == ValueType::DOUBLE_S && val2->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::DOUBLE_S;
+            returned_val->value.double_s = val1->value.double_s + val2->value.double_h;
+        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_MIN) {
+            returned_val->type = ValueType::DOUBLE_S;
+            returned_val->value.double_s = val2->value.double_s + val1->value.double_min;
+        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_H) {
+            returned_val->type = ValueType::DOUBLE_S;
+            returned_val->value.double_s = val2->value.double_s + val1->value.double_h;
+        } else if (val2->type == ValueType::DOUBLE_S && val1->type == ValueType::DOUBLE_S) {
+            returned_val->type = ValueType::DOUBLE_S;
+            returned_val->value.double_s = val2->value.double_s + val1->value.double_s;
+        } else
             throw tln_exception("Cannot use addition with specified operands\n");
         return returned_val;
     }
 
-    void OperatorOperation::assign(const std::shared_ptr<Value> &val1, std::shared_ptr<Value> val2) {
-        if (val1->type != ValueType::VARIABLE)
+    void OperatorOperation::assign(std::shared_ptr<Value> val) {
+        std::unique_ptr<Literal> literal = reinterpret_cast<std::unique_ptr<Literal> &&>(first_operand);
+
+        if (literal->val->type != ValueType::VARIABLE)
             throw tln_exception("Cannot assign value to non-variable\n");
 
-        context->addVariable(val1->value_str, std::move(val2));
+        context->addVariable(literal->val->value_str, std::move(val));
     }
 
     std::shared_ptr<Value> OperatorOperation::negation(std::shared_ptr<Value> val1) {

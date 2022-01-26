@@ -43,11 +43,15 @@ namespace parser {
         for (int j = 0; j < params.size(); ++j)
             context->addVariable(params[j], args_val[j]);
 
-        for (auto &instr: body)
+        for (auto &instr: body) {
             instr->execute();
-        //TODO returning value ...
+            if (context->endProgramExecution)
+                break;
+        }
+
+        std::shared_ptr<Value> ret_val = context->returned_value;
         context->removeFunCallContext();
 
-        return {};
+        return ret_val;
     }
 }

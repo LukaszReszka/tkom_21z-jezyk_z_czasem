@@ -3,8 +3,8 @@
 #include "funcdef.h"
 
 namespace parser {
-    FuncDef::FuncDef(std::string &name, std::vector<std::string> &params,
-                     std::vector<std::unique_ptr<Phrase>> &body) : func_name(name), params(params) {
+    FuncDef::FuncDef(std::string &name, std::vector<std::string> &params, std::vector<std::unique_ptr<Phrase>> &body,
+                     std::shared_ptr<interpreter::Context> c) : func_name(name), params(params), context(std::move(c)) {
         for (auto &i: body)
             func_body.push_back(std::move(i));
     }
@@ -29,6 +29,6 @@ namespace parser {
     }
 
     void FuncDef::execute() {
-
+        context->saveFuncDef(func_name, params, func_body);
     }
 }

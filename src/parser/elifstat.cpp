@@ -26,6 +26,16 @@ namespace parser {
     }
 
     void ElifStat::execute() {
+        context->addScope();
+        for (auto &i: body) {
+            i->execute();
+            if (context->endProgramExecution)
+                break;
+        }
+        context->removeScope();
+    }
 
+    bool ElifStat::evaluateCondition() {
+        return cond->evaluate()->value.boolean;
     }
 }

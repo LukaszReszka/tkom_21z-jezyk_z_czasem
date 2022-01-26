@@ -17,6 +17,8 @@ namespace parser {
 
         void execute() override;
 
+        bool evaluateCondition();
+
     private:
         std::unique_ptr<Expression> cond;
         std::vector<std::unique_ptr<Phrase>> body;

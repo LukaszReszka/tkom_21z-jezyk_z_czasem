@@ -32,6 +32,21 @@ namespace parser {
     }
 
     void IfStatement::execute() {
-
+        if (cond->evaluate()->value.boolean) {
+            context->addScope();
+            for (auto &i: body) {
+                i->execute();
+                if (context->endProgramExecution)
+                    break;
+            }
+            context->removeScope();
+        } else {
+            for (auto &elif: elifs) {
+                if (elif->evaluateCondition()) {
+                    elif->execute();
+                    break;
+                }
+            }
+        }
     }
 }

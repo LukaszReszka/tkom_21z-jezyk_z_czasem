@@ -18,9 +18,9 @@ namespace parser {
 
     unique_ptr<Command> Parser::parseCommand() {
         if (current_token.type == lexer::T_FUNC)
-            return std::make_unique<Command>(std::move(parseFuncDef()), context);
+            return std::make_unique<Command>(std::move(parseFuncDef()));
         else
-            return std::make_unique<Command>(std::move(parseInstruction()), context);
+            return std::make_unique<Command>(std::move(parseInstruction()));
     }
 
     unique_ptr<FuncDef> Parser::parseFuncDef() {
@@ -31,7 +31,7 @@ namespace parser {
         parseFuncParams(func_args);
         vector<unique_ptr<Phrase>> body;
         parseInstructionsBlock(body);
-        return std::make_unique<FuncDef>(func_name, func_args, body);
+        return std::make_unique<FuncDef>(func_name, func_args, body, context);
     }
 
     unique_ptr<Instruction> Parser::parseInstruction() {
@@ -64,7 +64,7 @@ namespace parser {
             throw tln_exception("Lack of \")\"");
 
         advance();
-        return std::make_unique<ReturnInstr>(std::move(ret_val));
+        return std::make_unique<ReturnInstr>(std::move(ret_val), context);
     }
 
     unique_ptr<IfStatement> Parser::parseIf() {

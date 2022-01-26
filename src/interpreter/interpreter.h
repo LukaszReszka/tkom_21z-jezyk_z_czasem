@@ -14,7 +14,7 @@ namespace interpreter {
 
         inline void showProgramTree() { std::cout << programTree->toString(0); }
 
-        void execudeProgram();
+        void executeProgram();
 
     private:
         bool hasErrorOccurred = false, hasExecutionFinished = false;

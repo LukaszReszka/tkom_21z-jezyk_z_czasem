@@ -26,6 +26,19 @@ namespace parser {
     }
 
     void WhileLoop::execute() {
+        context->addScope();
+        while (!context->endProgramExecution) {
+            if (cond->evaluate()->value.boolean) {
 
+                for (auto &i: body) {
+                    i->execute();
+                    if (context->endProgramExecution)
+                        break;
+                }
+
+            } else
+                break;
+        }
+        context->removeScope();
     }
 }

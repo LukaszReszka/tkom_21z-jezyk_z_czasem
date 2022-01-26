@@ -1,8 +1,10 @@
 #include <memory>
+#include <utility>
 #include "returninstr.h"
 
 namespace parser {
-    ReturnInstr::ReturnInstr(std::unique_ptr<Expression> ret_val) : returned_value(std::move(ret_val)) {}
+    ReturnInstr::ReturnInstr(std::unique_ptr<Expression> ret_val, std::shared_ptr<interpreter::Context> c)
+            : returned_value(std::move(ret_val)), context(std::move(c)) {}
 
     std::string ReturnInstr::toString(int depth) {
         std::string hyphens;
@@ -14,6 +16,7 @@ namespace parser {
     }
 
     void ReturnInstr::execute() {
-
+        context->endProgramExecution = true;
+        context->returned_value = returned_value->evaluate();
     }
 }
