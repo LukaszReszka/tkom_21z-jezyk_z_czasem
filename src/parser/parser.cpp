@@ -371,7 +371,7 @@ namespace parser {
                    current_token.type == lexer::T_SEC_U) {
             return std::move(parseTimeUnit());
         } else
-            throw tln_exception("Expected number, time moment or time period");
+            throw tln_exception("Expected literal");
 
         advance();
         return literal;
