@@ -5,6 +5,6 @@ add_executable(tests
         testCharAndPosition.cpp
         testCodeSource.cpp
         testLexer.cpp
-        testParser.cpp)
+        testParser.cpp testInterpreter.cpp)
 
-target_link_libraries(tests PRIVATE codeSource lexer parser doctest)
+target_link_libraries(tests PRIVATE codeSource lexer parser doctest interpreter)

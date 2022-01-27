@@ -22,7 +22,7 @@ namespace parser {
 
         std::shared_ptr<Value> evaluate() override;
 
-        std::unique_ptr<Value> val;
+        std::shared_ptr<Value> val;
 
     private:
         std::shared_ptr<interpreter::Context> context;

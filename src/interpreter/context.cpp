@@ -50,10 +50,16 @@ namespace interpreter {
     }
 
     void Context::addVariable(std::string &name, std::shared_ptr<Value> value) {
-        if (funcs_context.empty())
-            global_scopes.addVariable(name, std::move(value));
-        else
-            funcs_context.back().addVariable(name, std::move(value));
+        if (!funcs_context.empty()) {
+            bool found_in_fun_context = false;
+            funcs_context.back().getVariableValue(name, found_in_fun_context);
+            if (found_in_fun_context) {
+                funcs_context.back().addVariable(name, std::move(value));
+                return;
+            }
+        }
+
+        global_scopes.addVariable(name, std::move(value));
     }
 
     std::shared_ptr<Value> Context::getVariableValue(std::string &var_name, bool &foundVariable) {

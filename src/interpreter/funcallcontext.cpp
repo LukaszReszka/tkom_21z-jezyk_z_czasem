@@ -12,4 +12,17 @@ namespace interpreter {
 
         return {};
     }
+
+    void FunCallContext::addVariable(std::string &name, std::shared_ptr<Value> value) {
+        bool foundVariable = false;
+        for (auto it = func_scope.rbegin(); it != func_scope.rend(); ++it) {
+            it->getVariableValue(name, foundVariable);
+            if (foundVariable) {
+                it->addVariableToScope(name, value);
+                return;
+            }
+        }
+
+        func_scope.back().addVariableToScope(name, std::move(value));
+    }
 }

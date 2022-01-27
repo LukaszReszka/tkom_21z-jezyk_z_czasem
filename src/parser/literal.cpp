@@ -57,7 +57,7 @@ namespace parser {
 
     std::shared_ptr<Value> Literal::evaluate() {
         if (val->type != VARIABLE)
-            return std::move(val);
+            return val;
 
         bool foundVarVal = false;
         std::shared_ptr<Value> v = context->getVariableValue(val->value_str, foundVarVal);
